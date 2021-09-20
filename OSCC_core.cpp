@@ -20,7 +20,7 @@
                                                 f - float32
                                                 s - OSC string
                                                 b - OSC blob
-                                                Non-standard arguments:
+                                                Non-standard arguments_:
                                                         h - 64 bit big-endian two's complement integer
                                                         t - OSC-timetag
                                                         d - 64 bit ("double") IEEE 754 floating point number
@@ -52,7 +52,7 @@ namespace OSCC::core {
                 if(data.peek() == '#') {
                         // Is OSC bundle
                         if(read::string(data) != "#bundle")
-                                throw std::domain_error("When a OSC packet address starts with '#' it must be \"#bundle\" representing a bundle");
+                                throw std::domain_error("When a OSC packet address_ starts with '#' it must be \"#bundle\" representing a bundle");
                         types::bundle bundle {read::time(data)};
                         while (!data.isEmpty())
                                 bundle.push(extractOSCPacket(data));
@@ -78,11 +78,11 @@ namespace OSCC::core {
                                 return types::packet{message};
                         } else {
                                 // Type tag omitted, packet has additional data
-                                throw std::domain_error("OSC message has no type tag, but contains arguments");
+                                throw std::domain_error("OSC message has no type tag, but contains arguments_");
                         }
 
                 } else {
-                        throw std::domain_error("A OSC packet address must be \"#bundle\" or must start with '/'");
+                        throw std::domain_error("A OSC packet address_ must be \"#bundle\" or must start with '/'");
                 }
         }
 }

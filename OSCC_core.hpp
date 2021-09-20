@@ -2,8 +2,8 @@
 
 #include "OSCC_types.hpp"
 #include "OSCC_read.hpp"
-#include "arrayConsumer.hpp"
+#include "OSCC_util.hpp"
 
 namespace OSCC::core {
-        types::packet extractOSCPacket(arrayConsumer<char> &raw);
+        types::packet extractOSCPacket(util::arrayConsumer<char> &raw);
 }

@@ -39,24 +39,24 @@ namespace OSCC::types {
 
         class message {
                 private:
-                        types::address address;
-                        types::arguments arguments;
+                        types::address address_;
+                        types::arguments arguments_;
 
                 public:
-                        message(types::address path);
-
-                        template<class T>
-                        void push(T && val);
+                        explicit message(types::address path);
+                        template<typename T> void push(T && val) { arguments_.push_back(std::forward<T>(val)); }
+                        [[nodiscard]] types::address address() const;
+                        [[nodiscard]] types::arguments arguments() const;
         };
 
         class bundle {
                 private:
-                        types::time time;
-                        types::packets contents;
+                        types::time time_;
+                        types::packets contents_;
                 public:
-                        bundle(types::time time);
-
-                        template<class T>
-                        void push(T && val);
+                        explicit bundle(types::time time);
+                        template<typename T> void push(T && val) { contents_.push_back(std::forward<T>(val)); }
+                        [[nodiscard]] types::time time() const;
+                        [[nodiscard]] types::packets contents() const;
         };
 }

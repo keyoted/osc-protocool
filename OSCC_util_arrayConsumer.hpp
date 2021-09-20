@@ -1,13 +1,15 @@
-#include "arrayConsumer.hpp"
+#pragma once
+
+#include "OSCC_util.hpp"
 
 namespace OSCC::util {
         template<typename T>
-        arrayConsumer::arrayConsumer(T *data, std::size_t size)
+        arrayConsumer<T>::arrayConsumer(T *data, std::size_t size)
                 :data(data), size(size) {}
 
         template<typename T>
-        T *arrayConsumer::consume(std::size_t elements) {
-                if (size > elements) throw std::out_of_range("Invalid access");
+        T *arrayConsumer<T>::consume(std::size_t elements) {
+                if (elements > size) throw std::out_of_range("Invalid access");
                 T *n = data;
                 data += elements;
                 size -= elements;
@@ -15,7 +17,7 @@ namespace OSCC::util {
         }
 
         template<typename T>
-        arrayConsumer<T> arrayConsumer::reserve(std::size_t limit) {
+        arrayConsumer<T> arrayConsumer<T>::reserve(std::size_t limit) {
                 if (limit > size) throw std::out_of_range("Cannot extend range");
                 T *n = data;
                 data += limit;
@@ -24,18 +26,18 @@ namespace OSCC::util {
         }
 
         template<typename T>
-        T arrayConsumer::peek() {
+        T arrayConsumer<T>::peek() const {
                 if (size == 0) throw std::out_of_range("Invalid access");
                 return *data;
         }
 
         template<typename T>
-        bool arrayConsumer::isEmpty() {
+        bool arrayConsumer<T>::isEmpty() {
                 return size == 0;
         }
 
         template<typename T>
-        T *arrayConsumer::consumeUntilOrThrow(const T &element) {
+        T *arrayConsumer<T>::consumeUntilOrThrow(const T &element) {
                 for (std::size_t consumed = 0; size - consumed != 0; consumed++) {
                         if (data[consumed] == element) {
                                 return consume(consumed + 1);
