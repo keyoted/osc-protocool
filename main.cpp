@@ -5,6 +5,8 @@
 #include "OSCC_core.hpp"
 
 
+size_t memdiv(const char *arr1, const char *arr2, size_t size);
+
 int main () {
         using namespace std;
         //                    0   1   2   3   4    5   6      7   8   9   10  11    12  13              14              15      16
@@ -33,7 +35,7 @@ int main () {
         //                         |   |   |    |   |   |   |   |   |   |    |   |      |   |   |   |   |     |   |               |               |         |   |   |   |   |    |   |      |   |   |   |   |     |   |               |               |               |               |           |
         char bundlebundleData[] = "size#bundle\0timetimesize/main/help/*//3\0,ifsb\0\0\0iiiiffffa string:)\0\0size\x01\x23\x45\x67\x89\xAB\xCD\xEF\xFF\0\0\0size/main/help/*//3\0,ifsb\0\0\0iiiiffffa string:)\0\0size\x01\x23\x45\x67\x89\xAB\xCD\xEF\xFF\x01\x23\x45\x67\x89\xAB\xCD\xEF\xFF\0\0size#bundle\0timetimesize/main/help/*//3\0,ifsb\0\0\0iiiiffffa string:)\0\0size\x01\x23\x45\x67\x89\xAB\xCD\xEF\xFF\0\0\0size/main/help/*//3\0,ifsb\0\0\0iiiiffffa string:)\0\0size\x01\x23\x45\x67\x89\xAB\xCD\xEF\xFF\x01\x23\x45\x67\x89\xAB\xCD\xEF\xFF\0";
         ((int*)bundlebundleData)[0] = (int) sizeof(bundlebundleData) - sizeof(OSCC::types::int32);
-        ((OSCC::types::time*)(bundlebundleData+3*4))[0] = (OSCC::types::time) 1234;
+        ((OSCC::types::time*)(bundlebundleData+3*4))[0] = (OSCC::types::time) 12345678;
         ((int*)bundlebundleData)[0+5] = (int) sizeof(messageData) - sizeof(OSCC::types::int32);
         ((int*)bundlebundleData)[7+5] = (int) 69;
         ((float*)bundlebundleData)[8+5] = 3.14f;
@@ -43,7 +45,7 @@ int main () {
         ((float*)bundlebundleData)[8+21] = 12.34f;
         ((int*)bundlebundleData)[12+21] = (int) 9+9;
         ((int*)bundlebundleData)[0+39] = (int) sizeof(bundleData) - sizeof(OSCC::types::int32);
-        ((OSCC::types::time*)(bundlebundleData+(3+39)*4))[0] = (OSCC::types::time) 1234;
+        ((OSCC::types::time*)(bundlebundleData+(3+39)*4))[0] = (OSCC::types::time) 87654321;
         ((int*)bundlebundleData)[0+39+5] = (int) sizeof(messageData) - sizeof(OSCC::types::int32);
         ((int*)bundlebundleData)[7+39+5] = (int) 69;
         ((float*)bundlebundleData)[8+39+5] = 3.14f;
@@ -53,6 +55,29 @@ int main () {
         ((float*)bundlebundleData)[8+39+21] = 12.34f;
         ((int*)bundlebundleData)[12+39+21] = (int) 9+9;
 
+        #define msgdta bundlebundleData
+        auto check = OSCC::core::OSCToBytes(OSCC::core::bytesToOSC(msgdta, sizeof(msgdta)));
+        cout << "COMPARE: " << memcmp(msgdta, check.data(), min(sizeof(msgdta), check.size())) << " (" << memdiv(msgdta, check.data(), min(sizeof(msgdta), check.size())) << ")" << endl;
+        auto j = 0;
+        auto jj = 0;
+        for(int i = 0; i < max(sizeof(msgdta), check.size()); i++) {
+                if(j == 4) cout << "  ";
+                if(j == 8) {cout << endl; j = 0; jj++;}
+                if(j == 0) cout << setw(2) << setfill('0') << dec << jj*2 << " " << setw(4) << setfill('0') << jj * 8 << ".   ";
+                j++;
+
+                if(i < sizeof(msgdta)) cout << setfill('0') << setw(2) << uppercase << hex << (int) (unsigned char) msgdta[i] << ".";
+                else cout << "  " << ".";
+
+                if(i < check.size()) cout << setfill('0') << setw(2) << uppercase << hex << (int) (unsigned char) check[i];
+                else cout << "  ";
+
+                if(i < sizeof(msgdta) && i < check.size() && msgdta[i] == check[i]) cout << "   ";
+                else cout << " ! ";
+        }
+        cout << endl;
+
+        /*
         array<pair<char*, size_t>, 3> testData {
                 pair{messageData, sizeof(messageData)},
                 pair{bundleData, sizeof(bundleData)},
@@ -128,11 +153,19 @@ int main () {
 
                 cout << "SIZE: " << data.second << endl;
                 OSCC::util::arrayConsumer<char> ac{data.first, data.second};
-                auto extracted = OSCC::core::extractOSCPacket(ac);
+                auto extracted = OSCC::core::bytesToOSC(ac);
                 visit(visitor, extracted);
                 cout << string(40,'-') << endl;
         }
+        */
 
 
         return 0;
+}
+
+size_t memdiv(const char *arr1, const char *arr2, size_t size) {
+        for (size_t i = 0; i < size; ++i)
+                if(arr1[i] != arr2[i])
+                        return i;
+        return -1;
 }
