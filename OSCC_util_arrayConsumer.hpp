@@ -2,7 +2,7 @@
 
 #include "OSCC_util.hpp"
 
-namespace OSCC::util {
+namespace oscc::core::util {
         template<typename T>
         arrayConsumer<T>::arrayConsumer(T *data, std::size_t size)
                 :data(data), size(size) {}

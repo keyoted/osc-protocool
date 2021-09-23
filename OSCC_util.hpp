@@ -2,8 +2,9 @@
 
 #include <cstddef>
 #include <stdexcept>
+#include "OSCC_types.hpp"
 
-namespace OSCC::util {
+namespace oscc::core::util {
         template<typename T>
         class arrayConsumer {
                 private:
@@ -17,6 +18,9 @@ namespace OSCC::util {
                         bool isEmpty();
                         T *consumeUntilOrThrow(const T &element);
         };
+
+        oscc::types::time NTPtoUNIX(const oscc::types::time &NTP);
+        oscc::types::time UNIXtoNTP(const oscc::types::time &UNIX);
 }
 
 #include "OSCC_util_arrayConsumer.hpp"

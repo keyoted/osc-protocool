@@ -1,9 +1,10 @@
 #pragma once
 
 #include "OSCC_types.hpp"
+#include "OSCC_util.hpp"
 #include <iostream>
 
-namespace OSCC::write {
+namespace oscc::core::write {
         void int32(const types::int32 &data, std::vector<char> &bytes) {
                 bytes.insert(bytes.end(), sizeof(types::int32), '\0');
                 memcpy(&*(bytes.end() - sizeof(types::int32)), &data, sizeof(types::int32));
@@ -14,9 +15,10 @@ namespace OSCC::write {
                 memcpy(&*(bytes.end() - sizeof(types::int32)), &data, sizeof(types::float32));
         }
 
-        void time(const types::time &data, std::vector<char> &bytes) {
+        void time(const types::time &UNIX, std::vector<char> &bytes) {
                 bytes.insert(bytes.end(), sizeof(types::time), '\0');
-                memcpy(&*(bytes.end() - sizeof(types::time)), &data, sizeof(types::time));
+                const auto NTP = oscc::util::UNIXtoNTP(UNIX);
+                memcpy(&*(bytes.end() - sizeof(types::time)), &NTP, sizeof(types::time));
         }
 
         void string(const types::string &data, std::vector<char> &bytes) {

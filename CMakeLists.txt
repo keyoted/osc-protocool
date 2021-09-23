@@ -11,6 +11,7 @@ add_library(
         OSCC_write.cpp
         OSCC_types_bundle.cpp
         OSCC_types_message.cpp
+        OSCC_util.cpp
 )
 
 add_executable(

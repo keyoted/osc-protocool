@@ -7,13 +7,15 @@
 #include <filesystem>
 #include <variant>
 
-namespace OSCC::types {
+namespace oscc::types {
 
         class message;
 
         class bundle;
 
         typedef std::int32_t int32;
+
+        typedef std::int64_t int64;
 
         typedef std::float_t float32;
 
@@ -23,7 +25,7 @@ namespace OSCC::types {
 
         typedef std::filesystem::path address;
 
-        typedef std::int64_t time;
+        typedef int64 time;
 
         typedef std::variant<
                 int32,
@@ -39,7 +41,7 @@ namespace OSCC::types {
 
         class message {
                 private:
-                        types::address address_;
+                        types::address address_pattern_;
                         types::arguments arguments_;
 
                 public:
@@ -53,6 +55,7 @@ namespace OSCC::types {
                 private:
                         types::time time_;
                         types::packets contents_;
+
                 public:
                         explicit bundle(types::time time);
                         template<typename T> void push(T && val) { contents_.push_back(std::forward<T>(val)); }

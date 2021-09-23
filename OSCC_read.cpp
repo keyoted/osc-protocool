@@ -1,6 +1,6 @@
 #include "OSCC_read.hpp"
 
-namespace OSCC::read {
+namespace oscc::core::read {
         types::int32 int32(util::arrayConsumer<char> &data) {
                 types::int32 ret;
                 std::memcpy(&ret, data.consume(sizeof(types::int32)), sizeof(types::int32));
@@ -14,9 +14,9 @@ namespace OSCC::read {
         }
 
         types::time time(util::arrayConsumer<char> &data) {
-                types::time ret;
-                std::memcpy(&ret, data.consume(sizeof(types::time)), sizeof(types::time));
-                return ret;
+                types::time NTP;
+                std::memcpy(&NTP, data.consume(sizeof(types::time)), sizeof(types::time));
+                return util::NTPtoUNIX(NTP);
         }
 
         types::string string(util::arrayConsumer<char> &data) {

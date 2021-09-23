@@ -2,8 +2,8 @@
 
 #include "OSCC_types.hpp"
 
-namespace OSCC::types {
-        bundle::bundle(OSCC::types::time time)
+namespace oscc::types {
+        bundle::bundle(oscc::types::time time)
         : time_(time)
         {}
 
