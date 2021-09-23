@@ -1,11 +1,11 @@
-#include "OSCC_util.hpp"
+#include "oscc_util.hpp"
 
 namespace oscc::core::util {
         oscc::types::time NTPtoUNIX(const oscc::types::time &NTP) {
                 if ((NTP & 1U) == 1) return 0; // Least significant bit means now
                 else {
-                        const auto seconds = ((oscc::types::int32*)NTP) [0];
-                        const auto fraction = ((oscc::types::int32*)NTP) [1];
+                        const auto seconds = ((oscc::types::int32*)&NTP) [0];
+                        const auto fraction = ((oscc::types::int32*)&NTP) [1];
                         const auto millis = (seconds * 1000) + ((fraction * 1000) / 0x100000000L);
                         return millis + 2208988800U; // There is a constant offset of seconds between 1900/1/1 UTC and 1970/1/1 UTC
                 }

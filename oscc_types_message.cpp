@@ -1,4 +1,4 @@
-#include "OSCC_types.hpp"
+#include "oscc_types.hpp"
 
 namespace oscc::types {
         message::message(oscc::types::address path)

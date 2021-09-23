@@ -1,4 +1,4 @@
-#include "OSCC_read.hpp"
+#include "oscc_read.hpp"
 
 namespace oscc::core::read {
         types::int32 int32(util::arrayConsumer<char> &data) {

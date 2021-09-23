@@ -2,7 +2,7 @@
 
 #include <cstddef>
 #include <stdexcept>
-#include "OSCC_types.hpp"
+#include "oscc_types.hpp"
 
 namespace oscc::core::util {
         template<typename T>
@@ -23,4 +23,4 @@ namespace oscc::core::util {
         oscc::types::time UNIXtoNTP(const oscc::types::time &UNIX);
 }
 
-#include "OSCC_util_arrayConsumer.hpp"
+#include "oscc_util_arrayConsumer.hpp"

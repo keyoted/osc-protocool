@@ -2,8 +2,8 @@
 #include <array>
 #include <functional>
 #include <type_traits>
-#include "OSCC_core.hpp"
-#include "OSCC_util.hpp"
+#include "oscc_core.hpp"
+#include "oscc_util.hpp"
 
 
 size_t memdiv(const char *arr1, const char *arr2, size_t size);

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "OSCC_util.hpp"
+#include "oscc_util.hpp"
 
 namespace oscc::core::util {
         template<typename T>

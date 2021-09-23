@@ -1,6 +1,6 @@
 #pragma once
 
-#include "OSCC_types.hpp"
+#include "oscc_types.hpp"
 
 namespace oscc::core::write {
         void int32(const types::int32 &data, std::vector<char> &bytes);

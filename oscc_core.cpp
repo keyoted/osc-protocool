@@ -1,4 +1,4 @@
-#include "OSCC_core.hpp"
+#include "oscc_core.hpp"
 
 
 namespace oscc::core {

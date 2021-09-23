@@ -1,7 +1,7 @@
 #pragma once
 
-#include "OSCC_types.hpp"
-#include "OSCC_util.hpp"
+#include "oscc_types.hpp"
+#include "oscc_util.hpp"
 #include <iostream>
 
 namespace oscc::core::write {
@@ -17,7 +17,7 @@ namespace oscc::core::write {
 
         void time(const types::time &UNIX, std::vector<char> &bytes) {
                 bytes.insert(bytes.end(), sizeof(types::time), '\0');
-                const auto NTP = oscc::util::UNIXtoNTP(UNIX);
+                const auto NTP = oscc::core::util::UNIXtoNTP(UNIX);
                 memcpy(&*(bytes.end() - sizeof(types::time)), &NTP, sizeof(types::time));
         }
 

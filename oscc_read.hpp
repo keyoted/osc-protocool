@@ -1,7 +1,7 @@
 #pragma once
 
-#include "OSCC_types.hpp"
-#include "OSCC_util.hpp"
+#include "oscc_types.hpp"
+#include "oscc_util.hpp"
 
 namespace oscc::core::read {
         types::int32 int32(util::arrayConsumer<char> &data);
