@@ -9,6 +9,8 @@ namespace oscc {
         }
 
         const type::call_back& address_space::find(std::string pattern, const type::call_back& not_found) {
+                if(!oscc::core::util::isValidPattern(pattern))
+                        throw std::domain_error(std::string("Invalid pattern: [") + pattern + "]");
                 mutex_.lock();
                 for(const auto &adr : functions_) {
                         if(oscc::core::util::isMatch(adr.first, pattern)) {
@@ -23,6 +25,8 @@ namespace oscc {
         void address_space::registerFunction(const type::address adr, const type::call_back cal) {
                 // TODO: ensure address contains only legal characters
                 // TODO: ensure address is only address and not address pattern
+                if(!oscc::core::util::isValidAddress(adr.string()))
+                        throw std::domain_error(std::string("Invalid address: [") + adr.string() + "]");
                 mutex_.lock();
                 functions_.insert_or_assign(adr.string(), cal);
                 mutex_.unlock();

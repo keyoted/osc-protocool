@@ -22,6 +22,8 @@ namespace oscc::core::util {
         oscc::type::time NTPtoUNIX(const oscc::type::time &NTP);
         oscc::type::time UNIXtoNTP(const oscc::type::time &UNIX);
         bool isMatch(type::string address, type::string pattern);
+        bool isValidAddress(std::string address);
+        bool isValidPattern(std::string pattern);
 }
 
 #include "oscc_util_arrayConsumer.hpp"

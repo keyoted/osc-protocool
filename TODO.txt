@@ -3,10 +3,10 @@
 [X]     Implement address pattern matching
 [X]     Implement function dispatch
 [X]     Implement delayed function dispatch for OSC bundles
-[ ]     Validate OSC addresses
-[ ]     Validate OSC address patterns
+[X]     Validate OSC addresses
+[X]     Validate OSC address patterns
 [ ]     Validate timetags for bundles inside bundles
-[ ]     Implement 1.1 type
+[ ]     Implement 1.1 types
 [ ]             T - True. No bytes are allocated in the argument data.
 [ ]             F - False. No bytes are allocated in the argument data.
 [ ]             N - Nil. No bytes are allocated in the argument data.
@@ -25,3 +25,4 @@
 [ ]     Implement reading OSC messages from files.
 [ ]     Implement String-to-OSC
 [ ]     Implement OSC-to-string
+[ ]     Implement 1.1 "//" pattern matching

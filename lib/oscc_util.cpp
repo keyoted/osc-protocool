@@ -220,4 +220,45 @@ namespace oscc::core::util {
                 const char* patt = pattern.c_str();
                 return handle_wildcard(addr, patt);
         }
+
+        bool isValidAddress(std::string address) {
+                if(address[0] != '/') return false;
+                return std::all_of(address.begin(), address.end(), [](char c) {
+                        return isprint(c) && c != ' ' && c != '#' && c != '*' &&
+                                c != ',' && c != '?' && c != '[' && c != ']' &&
+                                c != '{' && c != '}';
+
+                });
+        }
+
+        bool isValidPattern(std::string pattern) {
+                enum validate_mode_{
+                        normal,
+                        in_brackets,
+                        in_list
+                };
+
+                if(pattern[0] != '/') return false;
+                validate_mode_ mode = normal;
+                for(const auto& c : pattern) {
+                        switch (mode) {
+                                case normal: {
+                                        if(!std::isprint(c) || c==' ' || c=='#' || c==',' || c==']' || c=='}') return false;
+                                        else if(c=='[') mode = in_brackets;
+                                        else if(c=='{') mode = in_list;
+                                } break;
+
+                                case in_brackets: {
+                                        if(!std::isprint(c) || c==' ' || c=='#' || c=='*' || c==',' || c=='/' || c=='?' || c=='[' || c=='{' || c=='}') return false;
+                                        else if (c==']') mode = normal;
+                                } break;
+
+                                case in_list: {
+                                        if(!std::isprint(c) || c==' ' || c=='#' || c=='*' || c=='/' || c=='?' || c=='{' || c=='[' || c==']') return false;
+                                        else if (c=='}') mode = normal;
+                                } break;
+                        }
+                }
+                return true;
+        }
 }
