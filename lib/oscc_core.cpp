@@ -42,6 +42,16 @@ namespace oscc::core {
                                                 case 'f': message.push(read::float32(data)); break;
                                                 case 's': message.push(read::string(data)); break;
                                                 case 'b': message.push(read::blob(data)); break;
+                                                #ifdef OSCC_TYPE_TF
+                                                        case 'T': message.push(type::T); break;
+                                                        case 'F': message.push(type::F); break;
+                                                #endif
+                                                #ifdef OSCC_TYPE_I
+                                                        case 'I': message.push(type::I); break;
+                                                #endif
+                                                #ifdef OSCC_TYPE_N
+                                                        case 'N': message.push(type::N); break;
+                                                #endif
                                         }
                                 }
                                 return type::packet{message};
@@ -97,6 +107,26 @@ namespace oscc::core {
                                         } else if constexpr(is_same_v<T, type::blob>) {
                                                 bytes[location++] = 'b';
                                                 write::blob(arg, bytes);
+                                        #ifdef OSCC_TYPES_VAL
+                                                } else if constexpr(is_same_v<T, type::value_argument>) {
+                                                        switch (arg) {
+                                                                #ifdef OSCC_TYPE_TF
+                                                                        case type::T: bytes[location++] = 'T'; break;
+                                                                        case type::F: bytes[location++] = 'F'; break;
+                                                                #endif
+                                                                #ifdef OSCC_TYPE_N
+                                                                        case type::N: bytes[location++] = 'N'; break;
+                                                                #endif
+                                                                #ifdef OSCC_TYPE_I
+                                                                        case type::I: bytes[location++] = 'I'; break;
+                                                                #endif
+                                                        }
+                                        #endif
+                                        #ifdef OSCC_TYPE_t
+                                                } else if constexpr(is_same_v<T, type::time>) {
+                                                        bytes[location++] = 't';
+                                                        write::time(arg, bytes);
+                                        #endif
                                         } else throw domain_error("Unknown type for argument");
                                 }, argument);
                         }

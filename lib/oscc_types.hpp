@@ -9,6 +9,13 @@
 #include <functional>
 #include <map>
 
+#ifdef OSCC_TYPE1_1
+        #define OSCC_TYPE_TF
+        #define OSCC_TYPE_N
+        #define OSCC_TYPE_I
+        #define OSCC_TYPE_t
+#endif
+
 namespace oscc::type {
 
         class message;
@@ -31,11 +38,34 @@ namespace oscc::type {
 
         typedef int64 time;
 
+#if defined(OSCC_TYPE_TF) || defined(OSCC_TYPE_N) || defined(OSCC_TYPE_I)
+        #define OSCC_TYPES_VAL
+        enum value_argument {
+        #ifdef OSCC_TYPE_TF
+                T,
+                F,
+        #endif
+        #ifdef OSCC_TYPE_N
+                N,
+        #endif
+        #ifdef OSCC_TYPE_I
+                I,
+        #endif
+        };
+#endif
+
         typedef std::variant<
-                int32,
-                float32,
-                string,
-                blob> argument;
+                int32
+                ,float32
+                ,string
+                ,blob
+                #ifdef OSCC_TYPES_VAL
+                        ,value_argument
+                #endif
+                #ifdef OSCC_TYPE_t
+                        ,time
+                #endif
+                > argument;
 
         typedef std::vector<argument> arguments;
 
