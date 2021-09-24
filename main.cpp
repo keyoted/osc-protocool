@@ -10,6 +10,9 @@ size_t memdiv(const char *arr1, const char *arr2, size_t size);
 
 int main () {
         using namespace std;
+        ios init(NULL);
+        init.copyfmt(cout);
+
         //                    0   1   2   3   4    5   6      7   8   9   10  11    12  13              14              15      16
         //                    |   |   |   |   |    |   |      |   |   |   |   |     |   |               |               |       |
         char messageData[] = "size/main/help/*//3\0,ifsb\0\0\0iiiiffffa string:)\0\0size\x01\x23\x45\x67\x89\xAB\xCD\xEF\xFF\0\0";
@@ -86,7 +89,7 @@ int main () {
 
         for(pair<char*, size_t> data : testData) {
                 size_t indent = 0;
-                function<void(oscc::types::packet)> visitor = [&indent, &visitor](oscc::types::packet &&val) {
+                function<void(oscc::types::packet)> visitor = [&indent, &visitor, &init](oscc::types::packet &&val) {
                         using namespace std;
                         const string i1 = string(indent*8, ' ');
                         const string i2 = string((indent+1)*8, ' ');
@@ -109,7 +112,7 @@ int main () {
                                 cout << i1 << "ADDRESS: " << message.address() << endl;
                                 cout << i1 << "ARGUMENTS:" << endl;
                                 for (const oscc::types::argument &argument: message.arguments()) {
-                                        visit([&i2](auto &&arg) {
+                                        visit([&i2, &init](auto &&arg) {
                                                 using T = decay_t<decltype(arg)>;
                                                 if constexpr(is_same_v<T, oscc::types::int32>) {
                                                         cout << i2 << string(20,'-') << endl;
@@ -126,8 +129,6 @@ int main () {
                                                 } else if constexpr(is_same_v<T, oscc::types::blob>) {
                                                         cout << i2 << string(20,'-') << endl;
                                                         cout << i2 << "TYPE: BLOB:" << endl;
-                                                        ios init(NULL);
-                                                        init.copyfmt(cout);
                                                         int i = 0;
                                                         for (const char &c: (oscc::types::blob) arg) {
                                                                 if (i == 4) cout << "   ";
@@ -151,11 +152,121 @@ int main () {
                         } else cout << i1 << "TYPE: ERROR" << endl;
                 };
 
+                cout.copyfmt(init);
                 cout << "SIZE: " << data.second << endl;
                 oscc::core::util::arrayConsumer<char> ac{data.first, data.second};
                 auto extracted = oscc::core::bytesToOSC(ac);
                 visit(visitor, extracted);
                 cout << string(40,'-') << endl;
+        }
+
+        const string pats[] = {
+                "/abc", "/abc", "t",
+                "/abc", "/abcd", "f",
+                "/abc", "/dabc", "f",
+                "/ab?", "/abc", "t",
+                "/a?c", "/abc", "t",
+                "/?bc", "/abc", "t",
+                "/ab?", "/abic", "f",
+                "/a?c", "/abic", "f",
+                "/?bc", "/abic", "f",
+
+                "/???/*abc", "/abc/xxxabc", "t",
+                "/???/abc*", "/abc/abcxxx", "t",
+                "/???/*abc*", "/abc/abcxxxabc", "t",
+                "/???/*abc", "/abc/xxxbc", "f",
+                "/???/abc*", "/abc/abxxx", "f",
+                "/???/*abc*", "/abc/xxxbxxx", "f",
+
+                "/???/[abc]", "/abc/a", "t",
+                "/???/[abc]", "/abc/b", "t",
+                "/???/[abc]", "/abc/c", "t",
+                "/???/[abc]", "/abc/d", "f",
+                "/???/[a-z]", "/abc/a", "t",
+                "/???/[a-z]", "/abc/r", "t",
+                "/???/[a-z]", "/abc/z", "t",
+                "/???/[-a]", "/abc/-", "t",
+                "/???/[a-]", "/abc/-", "t",
+                "/???/[a-]", "/abc/a", "t",
+                "/???/[a-]", "/abc/b", "f",
+
+                "/???/[!abc]", "/abc/a", "f",
+                "/???/[!abc]", "/abc/b", "f",
+                "/???/[!abc]", "/abc/c", "f",
+                "/???/[!abc]", "/abc/d", "t",
+                "/???/[!a-z]", "/abc/a", "f",
+                "/???/[!a-z]", "/abc/r", "f",
+                "/???/[!a-z]", "/abc/z", "f",
+                "/???/[!-a]", "/abc/-", "f",
+                "/???/[!a-]", "/abc/-", "f",
+                "/???/[!a-]", "/abc/a", "f",
+                "/???/[!a-]", "/abc/b", "t",
+
+                "{amy,lisa,hana}/???/[xyz]/[!aeiou]", "amy/XYZ/z/t", "t",
+                "{amy,lisa,hana}/???/[xyz]/[!aeiou]", "lisa/dei/x/f", "t",
+                "{amy,lisa,hana}/???/[xyz]/[!aeiou]", "hana/wie/y/s", "t",
+                "{amy,lisa,hana}/???/[xyz]/[!aeiou]", "jame/XYZ/z/t", "f",
+                "{amy,lisa,hana}/???/[xyz]/[!aeiou]", "amy/aXYZ/z/t", "f",
+                "{amy,lisa,hana}/???/[xyz]/[!aeiou]", "amy/XYZ/Z/t", "f",
+                "{amy,lisa,hana}/???/[xyz]/[!aeiou]", "amy/XYZ/z/a", "f",
+                "{amy,lisa,hana}/???/[xyz]/[!aeiou]", "amy/XYZ/zz/t", "f",
+                "{amy,lisa,hana}/???/[xyz]/[!aeiou]", "amy/XYZ/z/tr", "f",
+
+                "/abc/abc/abc", "/abc/abc/abc", "t",
+                "/abc/abc/abc", "/abcd/abcd/abcd", "f",
+                "/abc/abc/abc", "/dabc/dabc/dabc", "f",
+                "/ab?/ab?/ab?", "/abc/abc/abc", "t",
+                "/a?c/a?c/a?c", "/abc/abc/abc", "t",
+                "/?bc/?bc/?bc", "/abc/abc/abc", "t",
+                "/ab?/ab?/ab?", "/abic/abic/abic", "f",
+                "/a?c/a?c/a?c", "/abic/abic/abic", "f",
+                "/?bc/?bc/?bc", "/abic/abic/abic", "f",
+                "/???/*abc/???/*abc", "/abc/xxxabc/abc/xxxabc", "t",
+                "/???/abc*/???/abc*", "/abc/abcxxx/abc/abcxxx", "t",
+                "/???/*abc*/???/*abc*", "/abc/abcxxxabc/abc/abcxxxabc", "t",
+                "/???/*abc/???/*abc", "/abc/xxxbc/abc/xxxbc", "f",
+                "/???/abc*/???/abc*", "/abc/abxxx/abc/abxxx", "f",
+                "/???/*abc*/???/*abc*", "/abc/xxxbxxx/abc/xxxbxxx", "f",
+                "/???/[abc]/???/[abc]", "/abc/a/abc/a", "t",
+                "/???/[abc]/???/[abc]", "/abc/b/abc/b", "t",
+                "/???/[abc]/???/[abc]", "/abc/c/abc/c", "t",
+                "/???/[abc]/???/[abc]", "/abc/d/abc/d", "f",
+                "/???/[a-z]/???/[a-z]", "/abc/a/abc/a", "t",
+                "/???/[a-z]/???/[a-z]", "/abc/r/abc/r", "t",
+                "/???/[a-z]/???/[a-z]", "/abc/z/abc/z", "t",
+                "/???/[-a]/???/[-a]", "/abc/-/abc/-", "t",
+                "/???/[a-]/???/[a-]", "/abc/-/abc/-", "t",
+                "/???/[a-]/???/[a-]", "/abc/a/abc/a", "t",
+                "/???/[a-]/???/[a-]", "/abc/b/abc/b", "f",
+                "/???/[!abc]/???/[!abc]", "/abc/a/abc/a", "f",
+                "/???/[!abc]/???/[!abc]", "/abc/b/abc/b", "f",
+                "/???/[!abc]/???/[!abc]", "/abc/c/abc/c", "f",
+                "/???/[!abc]/???/[!abc]", "/abc/d/abc/d", "t",
+                "/???/[!a-z]/???/[!a-z]", "/abc/a/abc/a", "f",
+                "/???/[!a-z]/???/[!a-z]", "/abc/r/abc/r", "f",
+                "/???/[!a-z]/???/[!a-z]", "/abc/z/abc/z", "f",
+                "/???/[!-a]/???/[!-a]", "/abc/-/abc/-", "f",
+                "/???/[!a-]/???/[!a-]", "/abc/-/abc/-", "f",
+                "/???/[!a-]/???/[!a-]", "/abc/a/abc/a", "f",
+                "/???/[!a-]/???/[!a-]", "/abc/b/abc/b", "t",
+                "/{amy,lisa,hana}/???/[xyz]/[!aeiou]/{amy,lisa,hana}/???/[xyz]/[!aeiou]", "/amy/XYZ/z/t/amy/XYZ/z/t", "t",
+                "/{amy,lisa,hana}/???/[xyz]/[!aeiou]/{amy,lisa,hana}/???/[xyz]/[!aeiou]", "/lisa/dei/x/f/lisa/dei/x/f", "t",
+                "/{amy,lisa,hana}/???/[xyz]/[!aeiou]/{amy,lisa,hana}/???/[xyz]/[!aeiou]", "/hana/wie/y/s/hana/wie/y/s", "t",
+                "/{amy,lisa,hana}/???/[xyz]/[!aeiou]/{amy,lisa,hana}/???/[xyz]/[!aeiou]", "/jame/XYZ/z/t/jame/XYZ/z/t", "f",
+                "/{amy,lisa,hana}/???/[xyz]/[!aeiou]/{amy,lisa,hana}/???/[xyz]/[!aeiou]", "/amy/aXYZ/z/t/amy/aXYZ/z/t", "f",
+                "/{amy,lisa,hana}/???/[xyz]/[!aeiou]/{amy,lisa,hana}/???/[xyz]/[!aeiou]", "/amy/XYZ/Z/t/amy/XYZ/Z/t", "f",
+                "/{amy,lisa,hana}/???/[xyz]/[!aeiou]/{amy,lisa,hana}/???/[xyz]/[!aeiou]", "/amy/XYZ/z/a/amy/XYZ/z/a", "f",
+                "/{amy,lisa,hana}/???/[xyz]/[!aeiou]/{amy,lisa,hana}/???/[xyz]/[!aeiou]", "/amy/XYZ/zz/t/amy/XYZ/zz/t", "f",
+                "/{amy,lisa,hana}/???/[xyz]/[!aeiou]/{amy,lisa,hana}/???/[xyz]/[!aeiou]", "/amy/XYZ/z/tr/amy/XYZ/z/tr", "f"
+
+        };
+
+        cout.copyfmt(init);
+        cout << "+++ MATCH +++" << endl;
+        for(size_t i = 0; i < sizeof(pats)/sizeof(pats[0]); i+=3) {
+                bool res = oscc::core::util::isMatch(pats[i+1], pats[i]);
+                bool expected = (pats[i + 2] == "t");
+                cout << ((res == expected) ? "OK     " : "ERROR  ") << pats[i+1] << " == " << pats[i] << "   -> " << res << "\t\t[" << i << "]" << endl;
         }
 
         return 0;

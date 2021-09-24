@@ -17,6 +17,8 @@ namespace oscc::types {
 
         typedef std::int32_t int32;
 
+        typedef std::uint32_t uint32;
+
         typedef std::int64_t int64;
 
         typedef std::float_t float32;

@@ -1,6 +1,6 @@
 [X]     Implement time (Internet NTP timestamps)
 [X]     Implement function registering into an "OSC Address Space"
-[ ]     Implement address pattern matching
+[X]     Implement address pattern matching
 [ ]     Implement function dispatch
 [ ]     Implement times function dispatch for OSC bundles
 [ ]     Validate OSC addresses
