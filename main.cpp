@@ -25,7 +25,7 @@ int main () {
         //                   |   |   |    |   |   |   |   |   |   |    |   |      |   |   |   |   |     |   |               |               |         |   |   |   |   |    |   |      |   |   |   |   |     |   |               |               |               |               |         |
         char bundleData[] = "size#bundle\0timetimesize/main/help/*//3\0,ifsb\0\0\0iiiiffffa string:)\0\0size\x01\x23\x45\x67\x89\xAB\xCD\xEF\xFF\0\0\0size/main/help/*//3\0,ifsb\0\0\0iiiiffffa string:)\0\0size\x01\x23\x45\x67\x89\xAB\xCD\xEF\xFF\x01\x23\x45\x67\x89\xAB\xCD\xEF\xFF\0";
         ((int*)bundleData)[0] = (int) sizeof(bundleData) - sizeof(oscc::type::int32);
-        ((oscc::type::time*)(bundleData + 3 * 4))[0] = (oscc::type::time) 1234;
+        ((oscc::type::time*)(bundleData + 3 * 4))[0] = oscc::type::time{1234};
         ((int*)bundleData)[0+5] = (int) sizeof(messageData) - sizeof(oscc::type::int32);
         ((int*)bundleData)[7+5] = (int) 69;
         ((float*)bundleData)[8+5] = 3.14f;
@@ -39,7 +39,7 @@ int main () {
         //                         |   |   |    |   |   |   |   |   |   |    |   |      |   |   |   |   |     |   |               |               |         |   |   |   |   |    |   |      |   |   |   |   |     |   |               |               |               |               |           |
         char bundlebundleData[] = "size#bundle\0timetimesize/main/help/*//3\0,ifsb\0\0\0iiiiffffa string:)\0\0size\x01\x23\x45\x67\x89\xAB\xCD\xEF\xFF\0\0\0size/main/help/*//3\0,ifsb\0\0\0iiiiffffa string:)\0\0size\x01\x23\x45\x67\x89\xAB\xCD\xEF\xFF\x01\x23\x45\x67\x89\xAB\xCD\xEF\xFF\0\0size#bundle\0timetimesize/main/help/*//3\0,ifsb\0\0\0iiiiffffa string:)\0\0size\x01\x23\x45\x67\x89\xAB\xCD\xEF\xFF\0\0\0size/main/help/*//3\0,ifsb\0\0\0iiiiffffa string:)\0\0size\x01\x23\x45\x67\x89\xAB\xCD\xEF\xFF\x01\x23\x45\x67\x89\xAB\xCD\xEF\xFF\0";
         ((int*)bundlebundleData)[0] = (int) sizeof(bundlebundleData) - sizeof(oscc::type::int32);
-        ((oscc::type::time*)(bundlebundleData + 3 * 4))[0] = (oscc::type::time) 12345678;
+        ((oscc::type::time*)(bundlebundleData + 3 * 4))[0] = oscc::type::time{12345678};
         ((int*)bundlebundleData)[0+5] = (int) sizeof(messageData) - sizeof(oscc::type::int32);
         ((int*)bundlebundleData)[7+5] = (int) 69;
         ((float*)bundlebundleData)[8+5] = 3.14f;
@@ -49,7 +49,7 @@ int main () {
         ((float*)bundlebundleData)[8+21] = 12.34f;
         ((int*)bundlebundleData)[12+21] = (int) 9+9;
         ((int*)bundlebundleData)[0+39] = (int) sizeof(bundleData) - sizeof(oscc::type::int32);
-        ((oscc::type::time*)(bundlebundleData + (3 + 39) * 4))[0] = (oscc::type::time) 87654321;
+        ((oscc::type::time*)(bundlebundleData + (3 + 39) * 4))[0] = oscc::type::time{87654321};
         ((int*)bundlebundleData)[0+39+5] = (int) sizeof(messageData) - sizeof(oscc::type::int32);
         ((int*)bundlebundleData)[7+39+5] = (int) 69;
         ((float*)bundlebundleData)[8+39+5] = 3.14f;
@@ -97,7 +97,7 @@ int main () {
                         if (holds_alternative<oscc::type::bundle>(val)) {
                                 const oscc::type::bundle &bundle = get<oscc::type::bundle>(val);
                                 cout << i1 << "TYPE: BUNDLE" << endl;
-                                cout << i1<< "TIMESTAMP: " << bundle.time() << endl;
+                                cout << i1<< "TIMESTAMP: " << bundle.time().unix << endl;
                                 cout << i1<< "CONTENTS:" << endl;
                                 indent++;
                                 for(auto& content : bundle.contents()) {
@@ -107,7 +107,7 @@ int main () {
                                 }
                                 indent--;
                         } else if (holds_alternative<oscc::type::message>(val)) {
-                                const oscc::type::message &message = get<oscc::type::message>(val);
+                                oscc::type::message &message = get<oscc::type::message>(val);
                                 cout << i1 << "TYPE: MESSAGE" << endl;
                                 cout << i1 << "PATTERN: " << message.pattern() << endl;
                                 cout << i1 << "ARGUMENTS:" << endl;

@@ -4,7 +4,7 @@ project(OSCprotoCool VERSION 0.0.3)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_C_STANDARD 99)
 
-add_compile_definitions(OSCC_TYPE1_1)
+add_compile_definitions(OSCC_TYPE_NON_STD)
 add_library(
         OSCC STATIC
         lib/oscc_read.cpp

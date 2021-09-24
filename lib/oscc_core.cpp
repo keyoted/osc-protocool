@@ -29,7 +29,13 @@ namespace oscc::core {
                 } else {
                         // Is OSC message
                         type::message message {type::address{read::string(data) }};
-
+                        #ifndef OSCC_TYPE_ARR_
+                                #define push message.push
+                        #else
+                                std::vector<type::arguments*> stack{};
+                                stack.emplace_back(&message.arguments());
+                                #define push(E) stack.back()->emplace_back(E)
+                        #endif
                         if(data.isEmpty()) {
                                 // Type tag omitted, packet ended
                                 return type::packet{message};
@@ -38,20 +44,53 @@ namespace oscc::core {
                                 const type::string typeTag {read::string(data)};
                                 for(std::size_t i = 1; i < typeTag.length(); i++) {
                                         switch (typeTag[i]) {
-                                                case 'i': message.push(read::int32(data)); break;
-                                                case 'f': message.push(read::float32(data)); break;
-                                                case 's': message.push(read::string(data)); break;
-                                                case 'b': message.push(read::blob(data)); break;
+                                                case 'i': push(read::int32(data)); break;
+                                                case 'f': push(read::float32(data)); break;
+                                                case 's': push(read::string(data)); break;
+                                                case 'b': push(read::blob(data)); break;
                                                 #ifdef OSCC_TYPE_TF
-                                                        case 'T': message.push(type::T); break;
-                                                        case 'F': message.push(type::F); break;
+                                                        case 'T': push(type::T); break;
+                                                        case 'F': push(type::F); break;
                                                 #endif
                                                 #ifdef OSCC_TYPE_I
-                                                        case 'I': message.push(type::I); break;
+                                                        case 'I': push(type::I); break;
                                                 #endif
                                                 #ifdef OSCC_TYPE_N
-                                                        case 'N': message.push(type::N); break;
+                                                        case 'N': push(type::N); break;
                                                 #endif
+                                                #ifdef OSCC_TYPE_t
+                                                        case 't': push(type::argument(read::time(data))); break;
+                                                #endif
+                                                #ifdef OSCC_TYPE_h
+                                                        case 'h': push(read::int64(data)); break;
+                                                #endif
+                                                #ifdef OSCC_TYPE_d
+                                                        case 'd': push(read::float64(data)); break;
+                                                #endif
+                                                #ifdef OSCC_TYPE_c
+                                                        case 'c': push((char) read::int32(data)); break;
+                                                #endif
+                                                #ifdef OSCC_TYPE_m
+                                                        case 'm': push(read::midi(data)); break;
+                                                #endif
+                                                #ifdef OSCC_TYPE_r
+                                                        case 'r': push(read::rgba(data)); break;
+                                                #endif
+                                                #ifdef OSCC_TYPE_S
+                                                        case 'S': push(type::symbol{read::string(data)}); break;
+                                                #endif
+                                                #ifdef OSCC_TYPE_ARR_
+                                                        case '[': {
+                                                                push(type::arguments{});
+                                                                stack.emplace_back(&std::get<type::arguments>(stack.back()->back()));
+                                                        } break;
+
+                                                        case ']': {
+                                                                stack.pop_back();
+                                                        } break;
+                                                #endif
+                                                default:
+                                                        throw std::domain_error(std::string("Unrecognized tag: [") + typeTag[i] + "]");
                                         }
                                 }
                                 return type::packet{message};
@@ -88,48 +127,118 @@ namespace oscc::core {
                         }
                 } else {
                         // Is message
-                        const auto &message = get<type::message>(data);
+                        auto message = get<type::message>(data);
                         write::string(message.pattern().string(), bytes);
                         auto location = bytes.size()+1;
-                        write::string(string(message.arguments().size()+1, ','), bytes);
-                        for(const auto &argument : message.arguments()) {
-                                visit([&](auto &&arg){
-                                        using T = decay_t<decltype(arg)>;
-                                        if constexpr(is_same_v<T, type::int32>) {
-                                                bytes[location++] = 'i';
-                                                write::int32(arg, bytes);
-                                        } else if constexpr(is_same_v<T, type::float32>) {
-                                                bytes[location++] = 'f';
-                                                write::float32(arg, bytes);
-                                        } else if constexpr(is_same_v<T, type::string>) {
-                                                bytes[location++] = 's';
-                                                write::string(arg, bytes);
-                                        } else if constexpr(is_same_v<T, type::blob>) {
-                                                bytes[location++] = 'b';
-                                                write::blob(arg, bytes);
-                                        #ifdef OSCC_TYPES_VAL
-                                                } else if constexpr(is_same_v<T, type::value_argument>) {
-                                                        switch (arg) {
-                                                                #ifdef OSCC_TYPE_TF
-                                                                        case type::T: bytes[location++] = 'T'; break;
-                                                                        case type::F: bytes[location++] = 'F'; break;
-                                                                #endif
-                                                                #ifdef OSCC_TYPE_N
-                                                                        case type::N: bytes[location++] = 'N'; break;
-                                                                #endif
-                                                                #ifdef OSCC_TYPE_I
-                                                                        case type::I: bytes[location++] = 'I'; break;
-                                                                #endif
-                                                        }
-                                        #endif
-                                        #ifdef OSCC_TYPE_t
-                                                } else if constexpr(is_same_v<T, type::time>) {
-                                                        bytes[location++] = 't';
-                                                        write::time(arg, bytes);
-                                        #endif
-                                        } else throw domain_error("Unknown type for argument");
-                                }, argument);
-                        }
+                        #ifndef OSCC_TYPE_ARR_
+                                const auto count = message.arguments().size()+1;
+                        #else
+                                std::vector<const type::argument*> stack{};
+                                auto count = 0;
+                                for(const auto& a : message.arguments()) stack.push_back(&a);
+                                while (!stack.empty()) {
+                                        const type::argument * const b = stack.back();
+                                        stack.pop_back();
+                                        if(!holds_alternative<type::arguments>(*b)) {
+                                                count++;
+                                        } else {
+                                                count+=2;
+                                                for(const auto& a : get<type::arguments>(*b)) stack.push_back(&a);
+                                        }
+                                }
+                        #endif
+                        write::string(string(count, ','), bytes);
+                        #ifndef OSCC_TYPE_ARR_
+                                for(const auto &argument : message.arguments()) {
+                        #else
+                                stack = vector<const type::argument*>{};
+                                for(std::size_t j = message.arguments().size()-1; j+1 != 0; j--) {
+                                        stack.emplace_back(&message.arguments()[j]);
+                                }
+                                while (!stack.empty()) {
+                                        if(stack.back() == nullptr) {
+                                                stack.pop_back();
+                                                bytes[location++] = ']';
+                                                continue;
+                                        }
+                                        const auto &argument = *stack.back();
+                                        stack.pop_back();
+                        #endif
+                                        visit([&](auto &&arg){
+                                                using T = decay_t<decltype(arg)>;
+                                                if constexpr(is_same_v<T, type::int32>) {
+                                                        bytes[location++] = 'i';
+                                                        write::int32(arg, bytes);
+                                                } else if constexpr(is_same_v<T, type::float32>) {
+                                                        bytes[location++] = 'f';
+                                                        write::float32(arg, bytes);
+                                                } else if constexpr(is_same_v<T, type::string>) {
+                                                        bytes[location++] = 's';
+                                                        write::string(arg, bytes);
+                                                } else if constexpr(is_same_v<T, type::blob>) {
+                                                        bytes[location++] = 'b';
+                                                        write::blob(arg, bytes);
+                                                #ifdef OSCC_TYPES_VAL
+                                                        } else if constexpr(is_same_v<T, type::value_argument>) {
+                                                                switch (arg) {
+                                                                        #ifdef OSCC_TYPE_TF
+                                                                                case type::T: bytes[location++] = 'T'; break;
+                                                                                case type::F: bytes[location++] = 'F'; break;
+                                                                        #endif
+                                                                        #ifdef OSCC_TYPE_N
+                                                                                case type::N: bytes[location++] = 'N'; break;
+                                                                        #endif
+                                                                        #ifdef OSCC_TYPE_I
+                                                                                case type::I: bytes[location++] = 'I'; break;
+                                                                        #endif
+                                                                }
+                                                #endif
+                                                #ifdef OSCC_TYPE_t
+                                                        } else if constexpr(is_same_v<T, type::time>) {
+                                                                bytes[location++] = 't';
+                                                                write::time(arg, bytes);
+                                                #endif
+                                                #ifdef OSCC_TYPE_h
+                                                        } else if constexpr(is_same_v<T, type::int64>) {
+                                                                bytes[location++] = 'h';
+                                                                write::int64(arg, bytes);
+                                                #endif
+                                                #ifdef OSCC_TYPE_d
+                                                        } else if constexpr(is_same_v<T, type::float64>) {
+                                                                bytes[location++] = 'd';
+                                                                write::float64(arg, bytes);
+                                                #endif
+                                                #ifdef OSCC_TYPE_c
+                                                        } else if constexpr(is_same_v<T, char>) {
+                                                                bytes[location++] = 'c';
+                                                                write::int32((type::int32) arg, bytes);
+                                                #endif
+                                                #ifdef OSCC_TYPE_m
+                                                        } else if constexpr(is_same_v<T, type::midi>) {
+                                                                bytes[location++] = 'm';
+                                                                write::midi(arg, bytes);
+                                                #endif
+                                                #ifdef OSCC_TYPE_m
+                                                        } else if constexpr(is_same_v<T, type::rgba>) {
+                                                                bytes[location++] = 'r';
+                                                                write::rgba(arg, bytes);
+                                                #endif
+                                                #ifdef OSCC_TYPE_S
+                                                        } else if constexpr(is_same_v<T, type::symbol>) {
+                                                                bytes[location++] = 'S';
+                                                                write::string(arg.value, bytes);
+                                                #endif
+                                                #ifdef OSCC_TYPE_ARR_
+                                                        } else if constexpr(is_same_v<T, type::arguments>) {
+                                                                bytes[location++] = '[';
+                                                                stack.push_back(nullptr);
+                                                                for(std::size_t j = arg.size()-1; j+1 != 0; j--) {
+                                                                        stack.emplace_back(&arg[j]);
+                                                                }
+                                                #endif
+                                                } else throw domain_error("Unknown type for argument");
+                                        }, argument);
+                                }
                 }
 
                 // Overwrite size data

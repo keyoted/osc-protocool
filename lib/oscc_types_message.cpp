@@ -5,11 +5,15 @@ namespace oscc::type {
         : address_pattern_(std::move(path))
         {}
 
-        type::address message::pattern() const {
+        type::address& message::pattern() {
                 return address_pattern_;
         }
 
-        type::arguments message::arguments() const {
+        type::arguments& message::arguments() {
                 return arguments_;
+        }
+
+        void message::push(type::argument &arg) {
+                arguments_.insert(arguments_.end(), arg);
         }
 }

@@ -34,7 +34,7 @@ namespace oscc {
 
         void address_space::dispatch(type::packet pack, const type::call_back& not_found) {
                 if(std::holds_alternative<type::message>(pack)) {
-                        const auto& msg = std::get<type::message>(pack);
+                        auto& msg = std::get<type::message>(pack);
                         const auto& fcn = find(msg.pattern().string(), not_found);
                         mutex_.lock();
                         fcn(pack);
@@ -42,8 +42,8 @@ namespace oscc {
                 } else {
                         const auto& bdl = std::get<type::bundle>(pack);
                         const type::int64 milliseconds_since_epoch = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-                        if(milliseconds_since_epoch >= bdl.time()) delayed_dispatch(bdl, not_found, 0);
-                        else delayed_dispatch(bdl, not_found, bdl.time() - milliseconds_since_epoch);
+                        if(milliseconds_since_epoch >= bdl.time().unix) delayed_dispatch(bdl, not_found, 0);
+                        else delayed_dispatch(bdl, not_found, bdl.time().unix - milliseconds_since_epoch);
                 }
         }
 

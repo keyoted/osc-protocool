@@ -15,6 +15,11 @@ namespace oscc::core::write {
                 memcpy(&*(bytes.end() - sizeof(type::int32)), &data, sizeof(type::float32));
         }
 
+        void float64(const type::float64 &data, std::vector<char> &bytes) {
+                bytes.insert(bytes.end(), sizeof(type::float64), '\0');
+                memcpy(&*(bytes.end() - sizeof(type::float64)), &data, sizeof(type::float64));
+        }
+
         void time(const type::time &UNIX, std::vector<char> &bytes) {
                 bytes.insert(bytes.end(), sizeof(type::time), '\0');
                 const auto NTP = oscc::core::util::UNIXtoNTP(UNIX);
@@ -30,5 +35,20 @@ namespace oscc::core::write {
                 int32(data.size(), bytes);
                 bytes.insert(bytes.end(), data.begin(), data.end());
                 bytes.insert(bytes.end(), 4 - (data.size() % 4), '\0');
+        }
+
+        void int64(const type::int64 &data, std::vector<char> &bytes) {
+                bytes.insert(bytes.end(), sizeof(type::int64), '\0');
+                memcpy(&*(bytes.end() - sizeof(type::int64)), &data, sizeof(type::int64));
+        }
+
+        void midi(const type::midi &data, std::vector<char> &bytes) {
+                bytes.insert(bytes.end(), sizeof(type::midi), '\0');
+                memcpy(&*(bytes.end() - sizeof(type::midi)), &data, sizeof(type::midi));
+        }
+
+        void rgba(const type::rgba &data, std::vector<char> &bytes) {
+                bytes.insert(bytes.end(), sizeof(type::rgba), '\0');
+                memcpy(&*(bytes.end() - sizeof(type::rgba)), &data, sizeof(type::rgba));
         }
 }

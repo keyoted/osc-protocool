@@ -9,6 +9,17 @@
 #include <functional>
 #include <map>
 
+#ifdef OSCC_TYPE_NON_STD
+        #define OSCC_TYPE1_1
+        #define OSCC_TYPE_h
+        #define OSCC_TYPE_d
+        #define OSCC_TYPE_c
+        #define OSCC_TYPE_m
+        #define OSCC_TYPE_r
+        #define OSCC_TYPE_S
+        #define OSCC_TYPE_ARR_
+#endif
+
 #ifdef OSCC_TYPE1_1
         #define OSCC_TYPE_TF
         #define OSCC_TYPE_N
@@ -30,28 +41,66 @@ namespace oscc::type {
 
         typedef std::float_t float32;
 
+#ifdef OSCC_TYPE_d
+        typedef std::double_t float64;
+#endif
+
+#ifdef OSCC_TYPE_m
+        typedef struct {
+                unsigned char port_ID;
+                unsigned char status;
+                unsigned char data_1;
+                unsigned char data_2;
+        } midi;
+#endif
+
+#ifdef OSCC_TYPE_r
+        typedef struct {
+                unsigned char red;
+                unsigned char green;
+                unsigned char blue;
+                unsigned char alpha;
+        } rgba;
+#endif
+
+#ifdef OSCC_TYPE_S
+        class symbol {
+                public:
+                        std::string value;
+                        symbol(const std::string && str) : value(str) {};
+        };
+#endif
+
         typedef std::string string;
 
         typedef std::vector<char> blob;
 
         typedef std::filesystem::path address;
 
-        typedef int64 time;
+        typedef union {
+                int64 unix;
+                int64 ntp;
+        } time;
 
-#if defined(OSCC_TYPE_TF) || defined(OSCC_TYPE_N) || defined(OSCC_TYPE_I)
-        #define OSCC_TYPES_VAL
-        enum value_argument {
-        #ifdef OSCC_TYPE_TF
-                T,
-                F,
+        #if defined(OSCC_TYPE_TF) || defined(OSCC_TYPE_N) || defined(OSCC_TYPE_I)
+                #define OSCC_TYPES_VAL
+                enum value_argument {
+                #ifdef OSCC_TYPE_TF
+                        T,
+                        F,
+                #endif
+                #ifdef OSCC_TYPE_N
+                        N,
+                #endif
+                #ifdef OSCC_TYPE_I
+                        I,
+                #endif
+                };
         #endif
-        #ifdef OSCC_TYPE_N
-                N,
-        #endif
-        #ifdef OSCC_TYPE_I
-                I,
-        #endif
-        };
+
+
+#ifdef OSCC_TYPE_ARR_
+        class arguments;
 #endif
 
         typedef std::variant<
@@ -65,9 +114,31 @@ namespace oscc::type {
                 #ifdef OSCC_TYPE_t
                         ,time
                 #endif
+                #ifdef OSCC_TYPE_h
+                        ,int64
+                #endif
+                #ifdef OSCC_TYPE_d
+                        ,float64
+                #endif
+                #ifdef OSCC_TYPE_c
+                        ,char
+                #endif
+                #ifdef OSCC_TYPE_m
+                        ,midi
+                #endif
+                #ifdef OSCC_TYPE_r
+                        ,rgba
+                #endif
+                #ifdef OSCC_TYPE_S
+                        ,symbol
+                #endif
+                #ifdef OSCC_TYPE_ARR_
+                        ,arguments
+                #endif
                 > argument;
 
-        typedef std::vector<argument> arguments;
+
+        class arguments : public std::vector<argument> {};
 
         typedef std::variant<bundle, message> packet;
 
@@ -83,8 +154,9 @@ namespace oscc::type {
                 public:
                         explicit message(type::address path);
                         template<typename T> void push(T && val) { arguments_.push_back(std::forward<T>(val)); }
-                        [[nodiscard]] type::address pattern() const;
-                        [[nodiscard]] type::arguments arguments() const;
+                        void push(type::argument &arg);
+                        [[nodiscard]] type::address& pattern();
+                        [[nodiscard]] type::arguments& arguments();
         };
 
         class bundle {

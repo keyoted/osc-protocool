@@ -12,17 +12,18 @@
 [X]             N - Nil. No bytes are allocated in the argument data.
 [X]             I - Infinitum. No bytes are allocated in the argument data.
 [X]             t - OSC-timetag
-[ ]     Implement non-standard type
-[ ]             h - 64 bit big-endian two's complement integer
-[ ]             d - 64 bit ("double") IEEE 754 floating point number
-[ ]             S - Alternate type represented as an OSC-string (for example, for systems that differentiate "symbols" from "strings")
-[ ]             c - An ascii character, sent as 32 bits
-[ ]             r - 32 bit RGBA color
-[ ]             m - 4 byte MIDI message. Bytes from MSB to LSB are: port id, status byte, data1, data2
-[ ]             [ - Indicates the beginning of an array. The tags following are for data in the Array until a close brace tag is reached.
-[ ]             ] - Indicates the end of an array.
+[X]     Implement non-standard type
+[X]             h - 64 bit big-endian two's complement integer
+[X]             d - 64 bit ("double") IEEE 754 floating point number
+[X]             S - Alternate type represented as an OSC-string (for example, for systems that differentiate "symbols" from "strings")
+[X]             c - An ascii character, sent as 32 bits
+[X]             r - 32 bit RGBA color
+[X]             m - 4 byte MIDI message. Bytes from MSB to LSB are: port id, status byte, data1, data2
+[X]             [ - Indicates the beginning of an array. The tags following are for data in the Array until a close brace tag is reached.
+[X]             ] - Indicates the end of an array.
 [ ]     Implement writing OSC messages to files.
 [ ]     Implement reading OSC messages from files.
 [ ]     Implement String-to-OSC
 [ ]     Implement OSC-to-string
 [ ]     Implement 1.1 "//" pattern matching
+[ ]     Create tests
