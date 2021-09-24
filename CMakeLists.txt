@@ -6,13 +6,13 @@ set(CMAKE_C_STANDARD 99)
 
 add_library(
         OSCC STATIC
-        oscc_read.cpp
-        oscc_core.cpp
-        oscc_write.cpp
-        oscc_types_bundle.cpp
-        oscc_types_message.cpp
-        oscc_types_address_space.cpp
-        oscc_util.cpp
+        lib/oscc_read.cpp
+        lib/oscc_core.cpp
+        lib/oscc_write.cpp
+        lib/oscc_types_bundle.cpp
+        lib/oscc_types_message.cpp
+        lib/oscc_types_address_space.cpp
+        lib/oscc_util.cpp
 )
 
 add_executable(

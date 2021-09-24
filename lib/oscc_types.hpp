@@ -8,6 +8,9 @@
 #include <variant>
 #include <functional>
 #include <map>
+#include <thread>
+#include <mutex>
+#include "oscc_util.hpp"
 
 namespace oscc::types {
 
@@ -53,7 +56,7 @@ namespace oscc::types {
                 public:
                         explicit message(types::address path);
                         template<typename T> void push(T && val) { arguments_.push_back(std::forward<T>(val)); }
-                        [[nodiscard]] types::address address() const;
+                        [[nodiscard]] types::address pattern() const;
                         [[nodiscard]] types::arguments arguments() const;
         };
 
@@ -72,7 +75,11 @@ namespace oscc::types {
         class address_space {
                 private:
                         std::unordered_map<std::string, call_back> functions_;
+                        std::mutex mutex_;
+                        const call_back& find(std::string pattern, const call_back& not_found);
+                        void delayed_dispatch(bundle bdl, const call_back& not_found, int64 sleep);
                 public:
-                        void registerFunction(address a, call_back c);
+                        void registerFunction(address adr, call_back cal);
+                        void dispatch(packet pack, const call_back& not_found);
         };
 }
