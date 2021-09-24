@@ -11,6 +11,7 @@ add_library(
         oscc_write.cpp
         oscc_types_bundle.cpp
         oscc_types_message.cpp
+        oscc_types_address_space.cpp
         oscc_util.cpp
 )
 

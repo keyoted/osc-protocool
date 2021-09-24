@@ -6,6 +6,8 @@
 #include <string>
 #include <filesystem>
 #include <variant>
+#include <functional>
+#include <map>
 
 namespace oscc::types {
 
@@ -39,6 +41,8 @@ namespace oscc::types {
 
         typedef std::vector<packet> packets;
 
+        typedef std::function<void(packet)> call_back;
+
         class message {
                 private:
                         types::address address_pattern_;
@@ -61,5 +65,12 @@ namespace oscc::types {
                         template<typename T> void push(T && val) { contents_.push_back(std::forward<T>(val)); }
                         [[nodiscard]] types::time time() const;
                         [[nodiscard]] types::packets contents() const;
+        };
+
+        class address_space {
+                private:
+                        std::unordered_map<std::string, call_back> functions_;
+                public:
+                        void registerFunction(address a, call_back c);
         };
 }
