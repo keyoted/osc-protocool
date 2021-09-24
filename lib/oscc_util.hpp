@@ -19,9 +19,9 @@ namespace oscc::core::util {
                         T *consumeUntilOrThrow(const T &element);
         };
 
-        oscc::types::time NTPtoUNIX(const oscc::types::time &NTP);
-        oscc::types::time UNIXtoNTP(const oscc::types::time &UNIX);
-        bool isMatch(types::string address, types::string pattern);
+        oscc::type::time NTPtoUNIX(const oscc::type::time &NTP);
+        oscc::type::time UNIXtoNTP(const oscc::type::time &UNIX);
+        bool isMatch(type::string address, type::string pattern);
 }
 
 #include "oscc_util_arrayConsumer.hpp"

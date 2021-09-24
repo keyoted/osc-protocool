@@ -10,11 +10,11 @@ namespace oscc::core::util {
          * @param NTP The absolute time in NTP format.
          * @return The time in UNIX format (milliseconds since 1970/1/1 00:00 +0).
          */
-        oscc::types::time NTPtoUNIX(const oscc::types::time &NTP) {
+        oscc::type::time NTPtoUNIX(const oscc::type::time &NTP) {
                 if ((NTP & 1U) == 1) return 0; // Least significant bit means now
                 else {
-                        const auto seconds = ((oscc::types::uint32*)&NTP) [0];
-                        const auto fraction = ((oscc::types::uint32*)&NTP) [1];
+                        const auto seconds = ((oscc::type::uint32*)&NTP) [0];
+                        const auto fraction = ((oscc::type::uint32*)&NTP) [1];
                         const auto millis = (seconds * 1000) + ((fraction * 1000) / 0x100000000L);
                         // There is a constant offset of seconds between 1900/1/1 UTC and 1970/1/1 UTC
                         return millis + EPOCH_TIME_DIFFERENCE_MS;
@@ -26,13 +26,13 @@ namespace oscc::core::util {
          * @param UNIX The time in UNIX format (milliseconds since 1970/1/1 00:00 +0).
          * @return The time in NTP format.
          */
-        oscc::types::time UNIXtoNTP(const oscc::types::time &UNIX) {
+        oscc::type::time UNIXtoNTP(const oscc::type::time &UNIX) {
                 // There is a constant offset of seconds between 1900/1/1 UTC and 1970/1/1 UTC
                 const auto millis = UNIX - EPOCH_TIME_DIFFERENCE_MS;
-                const auto secconds = (types::uint32) (millis / 1000);
-                const auto fraction = (types::uint32) (((millis % 1000) * 0x100000000L) / 1000);
-                const oscc::types::uint32 ret[2] {secconds, fraction};
-                return *((oscc::types::time*)ret);
+                const auto secconds = (type::uint32) (millis / 1000);
+                const auto fraction = (type::uint32) (((millis % 1000) * 0x100000000L) / 1000);
+                const oscc::type::uint32 ret[2] {secconds, fraction};
+                return *((oscc::type::time*)ret);
         }
 
 
@@ -181,7 +181,7 @@ namespace oscc::core::util {
          * @param pattern The pattern to use for the matching.
          * @return True iff the address matches the pattern.
          */
-        bool isMatch(const types::string address, const types::string pattern) {
+        bool isMatch(const type::string address, const type::string pattern) {
                 // TODO: find a way to do this without recursion.
                 std::function<bool(const char*, const char*)> handle_wildcard;
                 handle_wildcard = [&handle_wildcard](const char* a, const char* p) -> bool {

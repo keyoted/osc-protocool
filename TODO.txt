@@ -6,13 +6,13 @@
 [ ]     Validate OSC addresses
 [ ]     Validate OSC address patterns
 [ ]     Validate timetags for bundles inside bundles
-[ ]     Implement 1.1 types
+[ ]     Implement 1.1 type
 [ ]             T - True. No bytes are allocated in the argument data.
 [ ]             F - False. No bytes are allocated in the argument data.
 [ ]             N - Nil. No bytes are allocated in the argument data.
 [ ]             I - Infinitum. No bytes are allocated in the argument data.
 [ ]             t - OSC-timetag
-[ ]     Implement non-standard types
+[ ]     Implement non-standard type
 [ ]             h - 64 bit big-endian two's complement integer
 [ ]             d - 64 bit ("double") IEEE 754 floating point number
 [ ]             S - Alternate type represented as an OSC-string (for example, for systems that differentiate "symbols" from "strings")

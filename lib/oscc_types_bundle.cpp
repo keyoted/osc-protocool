@@ -2,16 +2,16 @@
 
 #include "oscc_types.hpp"
 
-namespace oscc::types {
-        bundle::bundle(oscc::types::time time)
+namespace oscc::type {
+        bundle::bundle(oscc::type::time time)
         : time_(time)
         {}
 
-        types::time bundle::time() const {
+        type::time bundle::time() const {
                 return time_;
         }
 
-        types::packets bundle::contents() const {
+        type::packets bundle::contents() const {
                 return contents_;
         }
 }

@@ -7,8 +7,8 @@
 #include "oscc_write.hpp"
 
 namespace oscc::core {
-        types::packet bytesToOSC(char* bytes, size_t size);
-        types::packet bytesToOSC(types::blob bytes);
-        types::packet bytesToOSC(util::arrayConsumer<char> &bytes);
-        std::vector<char> OSCToBytes(const types::packet& data);
+        type::packet bytesToOSC(char* bytes, size_t size);
+        type::packet bytesToOSC(type::blob bytes);
+        type::packet bytesToOSC(util::arrayConsumer<char> &bytes);
+        std::vector<char> OSCToBytes(const type::packet& data);
 }

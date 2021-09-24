@@ -1,34 +1,34 @@
 #include "oscc_read.hpp"
 
 namespace oscc::core::read {
-        types::int32 int32(util::arrayConsumer<char> &data) {
-                types::int32 ret;
-                std::memcpy(&ret, data.consume(sizeof(types::int32)), sizeof(types::int32));
+        type::int32 int32(util::arrayConsumer<char> &data) {
+                type::int32 ret;
+                std::memcpy(&ret, data.consume(sizeof(type::int32)), sizeof(type::int32));
                 return ret;
         }
 
-        types::float32 float32(util::arrayConsumer<char> &data) {
-                types::float32 ret;
-                std::memcpy(&ret, data.consume(sizeof(types::float32)), sizeof(types::float32));
+        type::float32 float32(util::arrayConsumer<char> &data) {
+                type::float32 ret;
+                std::memcpy(&ret, data.consume(sizeof(type::float32)), sizeof(type::float32));
                 return ret;
         }
 
-        types::time time(util::arrayConsumer<char> &data) {
-                types::time NTP;
-                std::memcpy(&NTP, data.consume(sizeof(types::time)), sizeof(types::time));
+        type::time time(util::arrayConsumer<char> &data) {
+                type::time NTP;
+                std::memcpy(&NTP, data.consume(sizeof(type::time)), sizeof(type::time));
                 return util::NTPtoUNIX(NTP);
         }
 
-        types::string string(util::arrayConsumer<char> &data) {
-                types::string ret {data.consumeUntilOrThrow('\0')};
+        type::string string(util::arrayConsumer<char> &data) {
+                type::string ret {data.consumeUntilOrThrow('\0')};
                 data.consume(3 - ((ret.length() + (1+3)) % 4));
                 return ret;
         }
 
-        types::blob blob(util::arrayConsumer<char> &data) {
-                types::int32 size = int32(data);
+        type::blob blob(util::arrayConsumer<char> &data) {
+                type::int32 size = int32(data);
                 auto dr = data.reserve(size + (3 - ((size + 3) % 4)));
-                types::blob ret(dr.consume(0), dr.consume(0) + size);
+                type::blob ret(dr.consume(0), dr.consume(0) + size);
                 return ret;
         }
 }

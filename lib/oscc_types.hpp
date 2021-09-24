@@ -8,11 +8,8 @@
 #include <variant>
 #include <functional>
 #include <map>
-#include <thread>
-#include <mutex>
-#include "oscc_util.hpp"
 
-namespace oscc::types {
+namespace oscc::type {
 
         class message;
 
@@ -50,36 +47,25 @@ namespace oscc::types {
 
         class message {
                 private:
-                        types::address address_pattern_;
-                        types::arguments arguments_;
+                        type::address address_pattern_;
+                        type::arguments arguments_;
 
                 public:
-                        explicit message(types::address path);
+                        explicit message(type::address path);
                         template<typename T> void push(T && val) { arguments_.push_back(std::forward<T>(val)); }
-                        [[nodiscard]] types::address pattern() const;
-                        [[nodiscard]] types::arguments arguments() const;
+                        [[nodiscard]] type::address pattern() const;
+                        [[nodiscard]] type::arguments arguments() const;
         };
 
         class bundle {
                 private:
-                        types::time time_;
-                        types::packets contents_;
+                        type::time time_;
+                        type::packets contents_;
 
                 public:
-                        explicit bundle(types::time time);
+                        explicit bundle(type::time time);
                         template<typename T> void push(T && val) { contents_.push_back(std::forward<T>(val)); }
-                        [[nodiscard]] types::time time() const;
-                        [[nodiscard]] types::packets contents() const;
-        };
-
-        class address_space {
-                private:
-                        std::unordered_map<std::string, call_back> functions_;
-                        std::mutex mutex_;
-                        const call_back& find(std::string pattern, const call_back& not_found);
-                        void delayed_dispatch(bundle bdl, const call_back& not_found, int64 sleep);
-                public:
-                        void registerFunction(address adr, call_back cal);
-                        void dispatch(packet pack, const call_back& not_found);
+                        [[nodiscard]] type::time time() const;
+                        [[nodiscard]] type::packets contents() const;
         };
 }
