@@ -15,11 +15,6 @@ namespace oscc::core::write {
                 memcpy(&*(bytes.end() - sizeof(type::int32)), &data, sizeof(type::float32));
         }
 
-        void float64(const type::float64 &data, std::vector<char> &bytes) {
-                bytes.insert(bytes.end(), sizeof(type::float64), '\0');
-                memcpy(&*(bytes.end() - sizeof(type::float64)), &data, sizeof(type::float64));
-        }
-
         void time(const type::time &UNIX, std::vector<char> &bytes) {
                 bytes.insert(bytes.end(), sizeof(type::time), '\0');
                 const auto NTP = oscc::core::util::UNIXtoNTP(UNIX);
@@ -42,13 +37,24 @@ namespace oscc::core::write {
                 memcpy(&*(bytes.end() - sizeof(type::int64)), &data, sizeof(type::int64));
         }
 
-        void midi(const type::midi &data, std::vector<char> &bytes) {
-                bytes.insert(bytes.end(), sizeof(type::midi), '\0');
-                memcpy(&*(bytes.end() - sizeof(type::midi)), &data, sizeof(type::midi));
-        }
+        #ifdef OSCC_TYPE_d
+                void float64(const type::float64 &data, std::vector<char> &bytes) {
+                        bytes.insert(bytes.end(), sizeof(type::float64), '\0');
+                        memcpy(&*(bytes.end() - sizeof(type::float64)), &data, sizeof(type::float64));
+                }
+        #endif
 
-        void rgba(const type::rgba &data, std::vector<char> &bytes) {
-                bytes.insert(bytes.end(), sizeof(type::rgba), '\0');
-                memcpy(&*(bytes.end() - sizeof(type::rgba)), &data, sizeof(type::rgba));
-        }
+        #ifdef OSCC_TYPE_m
+                void midi(const type::midi &data, std::vector<char> &bytes) {
+                        bytes.insert(bytes.end(), sizeof(type::midi), '\0');
+                        memcpy(&*(bytes.end() - sizeof(type::midi)), &data, sizeof(type::midi));
+                }
+        #endif
+
+        #ifdef OSCC_TYPE_r
+                void rgba(const type::rgba &data, std::vector<char> &bytes) {
+                        bytes.insert(bytes.end(), sizeof(type::rgba), '\0');
+                        memcpy(&*(bytes.end() - sizeof(type::rgba)), &data, sizeof(type::rgba));
+                }
+        #endif
 }

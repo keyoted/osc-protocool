@@ -140,7 +140,7 @@ namespace oscc::type {
 
         class arguments : public std::vector<argument> {};
 
-        typedef std::variant<bundle, message> packet;
+        class packet;
 
         typedef std::vector<packet> packets;
 
@@ -169,5 +169,11 @@ namespace oscc::type {
                         template<typename T> void push(T && val) { contents_.push_back(std::forward<T>(val)); }
                         [[nodiscard]] type::time time() const;
                         [[nodiscard]] type::packets contents() const;
+        };
+
+        class packet : public std::variant<bundle, message> {
+                public:
+                        packet(std::string OSCstring);
+                        template<typename T> packet(T t) :variant(t) {};
         };
 }

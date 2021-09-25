@@ -13,12 +13,6 @@ namespace oscc::core::read {
                 return ret;
         }
 
-        type::float64 float64(util::arrayConsumer<char> &data) {
-                type::float64 ret;
-                std::memcpy(&ret, data.consume(sizeof(type::float64)), sizeof(type::float64));
-                return ret;
-        }
-
         type::time time(util::arrayConsumer<char> &data) {
                 type::time NTP;
                 std::memcpy(&NTP, data.consume(sizeof(type::time)), sizeof(type::time));
@@ -44,15 +38,27 @@ namespace oscc::core::read {
                 return ret;
         }
 
-        type::midi midi(util::arrayConsumer<char> &data) {
-                type::midi ret;
-                std::memcpy(&ret, data.consume(sizeof(type::midi)), sizeof(type::midi));
-                return ret;
-        }
+        #ifdef OSCC_TYPE_d
+                type::float64 float64(util::arrayConsumer<char> &data) {
+                        type::float64 ret;
+                        std::memcpy(&ret, data.consume(sizeof(type::float64)), sizeof(type::float64));
+                        return ret;
+                }
+        #endif
 
-        type::rgba rgba(util::arrayConsumer<char> &data) {
-                type::rgba ret;
-                std::memcpy(&ret, data.consume(sizeof(type::rgba)), sizeof(type::rgba));
-                return ret;
-        }
+        #ifdef OSCC_TYPE_m
+                type::midi midi(util::arrayConsumer<char> &data) {
+                        type::midi ret;
+                        std::memcpy(&ret, data.consume(sizeof(type::midi)), sizeof(type::midi));
+                        return ret;
+                }
+        #endif
+
+        #ifdef OSCC_TYPE_r
+                type::rgba rgba(util::arrayConsumer<char> &data) {
+                        type::rgba ret;
+                        std::memcpy(&ret, data.consume(sizeof(type::rgba)), sizeof(type::rgba));
+                        return ret;
+                }
+        #endif
 }

@@ -24,6 +24,7 @@ namespace oscc::core::util {
         bool isMatch(type::string address, type::string pattern);
         bool isValidAddress(std::string address);
         bool isValidPattern(std::string pattern);
+        std::variant<type::bundle, type::message> strToOSC(std::string OSCstr);
 }
 
 #include "oscc_util_arrayConsumer.hpp"
