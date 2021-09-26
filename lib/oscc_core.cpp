@@ -226,7 +226,7 @@ namespace oscc::core {
                                                 #ifdef OSCC_TYPE_S
                                                         } else if constexpr(is_same_v<T, type::symbol>) {
                                                                 bytes[location++] = 'S';
-                                                                write::string(arg.value, bytes);
+                                                                write::string(arg.identifier, bytes);
                                                 #endif
                                                 #ifdef OSCC_TYPE_ARR_
                                                         } else if constexpr(is_same_v<T, type::arguments>) {

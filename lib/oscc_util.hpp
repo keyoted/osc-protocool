@@ -19,12 +19,13 @@ namespace oscc::core::util {
                         T *consumeUntilOrThrow(const T &element);
         };
 
-        oscc::type::time NTPtoUNIX(const oscc::type::time &NTP);
-        oscc::type::time UNIXtoNTP(const oscc::type::time &UNIX);
+        type::time NTPtoUNIX(const oscc::type::time &NTP);
+        type::time UNIXtoNTP(const oscc::type::time &UNIX);
         bool isMatch(type::string address, type::string pattern);
         bool isValidAddress(std::string address);
         bool isValidPattern(std::string pattern);
-        std::variant<type::bundle, type::message> strToOSC(std::string OSCstr);
+        type::packet strToOSC(std::string OSCstr);
+        type::time getCurrentTime();
 }
 
 #include "oscc_util_arrayConsumer.hpp"

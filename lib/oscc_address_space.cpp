@@ -41,9 +41,9 @@ namespace oscc {
                         mutex_.unlock();
                 } else {
                         const auto& bdl = std::get<type::bundle>(pack);
-                        const type::int64 milliseconds_since_epoch = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-                        if(milliseconds_since_epoch >= bdl.time().unix) delayed_dispatch(bdl, not_found, 0);
-                        else delayed_dispatch(bdl, not_found, bdl.time().unix - milliseconds_since_epoch);
+                        const type::time milliseconds_since_epoch = core::util::getCurrentTime();
+                        if(milliseconds_since_epoch.unix >= bdl.time().unix) delayed_dispatch(bdl, not_found, 0);
+                        else delayed_dispatch(bdl, not_found, bdl.time().unix - milliseconds_since_epoch.unix);
                 }
         }
 

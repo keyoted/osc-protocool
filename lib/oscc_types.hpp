@@ -66,8 +66,8 @@ namespace oscc::type {
 #ifdef OSCC_TYPE_S
         class symbol {
                 public:
-                        std::string value;
-                        symbol(const std::string && str) : value(str) {};
+                        std::string identifier;
+                        symbol(const std::string && str) : identifier(str) {};
         };
 #endif
 
@@ -155,6 +155,7 @@ namespace oscc::type {
                         explicit message(type::address path);
                         template<typename T> void push(T && val) { arguments_.push_back(std::forward<T>(val)); }
                         void push(type::argument &arg);
+                        std::string string() const;
                         [[nodiscard]] type::address& pattern();
                         [[nodiscard]] type::arguments& arguments();
         };
@@ -167,6 +168,7 @@ namespace oscc::type {
                 public:
                         explicit bundle(type::time time);
                         template<typename T> void push(T && val) { contents_.push_back(std::forward<T>(val)); }
+                        std::string string() const;
                         [[nodiscard]] type::time time() const;
                         [[nodiscard]] type::packets contents() const;
         };
@@ -175,5 +177,6 @@ namespace oscc::type {
                 public:
                         packet(std::string OSCstring);
                         template<typename T> packet(T t) :variant(t) {};
+                        std::string string() const;
         };
 }

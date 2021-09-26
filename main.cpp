@@ -122,8 +122,9 @@ int main () {
                 cout << ((res == expected) ? "OK     " : "ERROR  ") << pats[i+1] << " == " << pats[i] << "   -> " << res << "\t\t[" << i << "]" << endl;
         }
 
-        auto t = oscc::core::util::strToOSC(R"(#123[/path 1 2.0 1i 2f 3l 4d "5" '6' {7} x0194 :123 #01020304 .01030507 [1[2]3];/path2;#;#0;#10000[/path3; /path4 [3 4 5]]; /*/hello 5 4 "bye"])");
-
+        auto t = oscc::core::util::strToOSC(R"(#1230[/path 1 2.0 1i 2f 3l 4d "5" '6' {7} x0194 :123 #01020304 .01030507 [1[2]3];/path2;#;#0;#10000[/path3; /path4 [3 4 5]]; /*/hello 5 4 "bye"])");
+        cout.copyfmt(init);
+        cout << t.string() << endl;
         return 0;
 }
 

@@ -283,7 +283,7 @@ namespace oscc::core::util {
                         [1[2]3]    -- is array with int, an array, and an int
         */
 
-        std::variant<type::bundle, type::message> strToOSC(std::string OSCstr) {
+        type::packet strToOSC(std::string OSCstr) {
                 auto pass_blob = [](char* &c, unsigned max) -> type::blob {
                         type::blob blob {};
                         unsigned char uc = 0;
@@ -451,8 +451,8 @@ namespace oscc::core::util {
                                         std::string ret;
                                         c++;
                                         while (*c != '\0') {
-                                                ret += *c;
                                                 if(*c == '"' && *(c-1) != '\\') break;
+                                                ret += *c;
                                                 c++;
                                         }
                                         if(*c == '\0') throw std::domain_error("Missing '\"' in OSC string");
@@ -463,11 +463,15 @@ namespace oscc::core::util {
 
                                 case '\'' : {
                                         c++;
-                                        if(*c == '\\') c++;
+                                        char r = *c;
+                                        if(*c == '\\') {
+                                                c++;
+                                                r = *c;
+                                        }
                                         if(*(c+1) != '\'')  throw std::domain_error("Missing \"'\" in OSC string");
                                         c+=2;
                                         while(*c == ' ') c++;
-                                        return *c;
+                                        return r;
                                 }
 
                                 case '[': throw std::domain_error("Illegal '['");
@@ -549,12 +553,9 @@ namespace oscc::core::util {
                                                         throw std::domain_error("Unknown error.");
                                                 }
 
-                                                const type::int64 milliseconds_since_epoch =
-                                                        std::chrono::duration_cast<std::chrono::milliseconds>(
-                                                                std::chrono::system_clock::now().time_since_epoch()
-                                                        ).count();
+                                                const type::time milliseconds_since_epoch = util::getCurrentTime();
 
-                                                return milliseconds_since_epoch + offset;
+                                                return type::time{milliseconds_since_epoch.unix + offset};
                                         }
                                 #endif
 
@@ -563,14 +564,14 @@ namespace oscc::core::util {
                                                 type::symbol ret{""};
                                                 c++;
                                                 while (*c != '\0') {
-                                                        ret.value += *c;
                                                         if(*c == '}' && *(c-1) != '\\') break;
+                                                        ret.identifier += *c;
                                                         c++;
                                                 }
                                                 if(*c == '\0') throw std::domain_error("Missing '}' in OSC string");
                                                 c++;
                                                 while(*c == ' ') c++;
-                                                return ret;
+                                                return type::symbol{ret};
                                         }
                                 #endif
                                 default:
@@ -679,5 +680,9 @@ namespace oscc::core::util {
                 } else {
                         throw std::domain_error("OSC message should start with '/' or '#'");
                 }
+        }
+
+        type::time getCurrentTime() {
+                return type::time{std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count()};
         }
 }
