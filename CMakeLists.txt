@@ -15,6 +15,7 @@ add_library(
         lib/oscc_types_packet.cpp
         lib/oscc_address_space.cpp
         lib/oscc_util.cpp
+        lib/oscc_util_string_conversions.cpp
 )
 
 add_executable(

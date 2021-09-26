@@ -39,7 +39,7 @@
 [X]             m - 4 byte MIDI message. Bytes from MSB to LSB are: port id, status byte, data1, data2
 [X]             [ - Indicates the beginning of an array. The tags following are for data in the Array until a close brace tag is reached.
 [X]             ] - Indicates the end of an array.
-[ ]     Implement OSC-to-string
+[X]     Implement OSC-to-string
 [ ]     Implement writing OSC messages to files.
 [ ]     Implement reading OSC messages from files.
 [ ]     Implement 1.1 "//" pattern matching

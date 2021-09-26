@@ -2,14 +2,7 @@
 #include "oscc_util.hpp"
 
 namespace oscc::type {
-        packet::packet(std::string OSCstring) :variant(oscc::core::util::strToOSC(std::move(OSCstring))) {}
+        packet::packet(std::string OSCstring) : variant(oscc::core::util::strToOSC(std::move(OSCstring))) {}
 
-        std::string packet::string() const {
-                const auto &var = *this;
-                if(std::holds_alternative<bundle>(var)) {
-                        return std::get<bundle>(var).string();
-                } else if(std::holds_alternative<message>(var)) {
-                        return std::get<message>(var).string();
-                } else return "";
-        }
-}
+        std::string packet::string() const { return core::util::string(*this); }
+}  // namespace oscc::type
