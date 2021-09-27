@@ -1,42 +1,40 @@
 #include "oscc_address_space.hpp"
-#include <thread>
 
 namespace oscc {
-        const type::call_back& address_space::find_(const std::string& pattern, const type::call_back& not_found) {
-                if (!oscc::core::util::isValidPattern(pattern))
-                        throw std::domain_error("Invalid pattern: [" + pattern + "]");
+        std::vector<type::call_back> address_space::find_(const std::string& pattern) {
+                if (!oscc::util::isValidPattern(pattern)) throw std::domain_error("Invalid pattern: [" + pattern + "]");
+
+                std::vector<type::call_back> functions{};
                 mutex_.lock();
                 for (const auto& adr : functions_) {
-                        if (oscc::core::util::isMatch(adr.first, pattern)) {
+                        if (oscc::util::isMatch(adr.first, pattern)) {
                                 mutex_.unlock();
-                                return adr.second;
+                                functions.push_back(adr.second);
                         }
                 }
                 mutex_.unlock();
-                return not_found;
+                return functions;
         }
 
-        void address_space::registerFunction(const type::address& adr, const type::call_back& cal) {
-                // TODO: ensure address contains only legal characters
-                // TODO: ensure address is only address and not address pattern
-                if (!oscc::core::util::isValidAddress(adr.string()))
-                        throw std::domain_error(std::string("Invalid address: [") + adr.string() + "]");
+        void address_space::registerFunction(const type::address& address, const type::call_back& call_back) {
+                if (!oscc::util::isValidAddress(address.string()))
+                        throw std::domain_error(std::string("Invalid address: [") + address.string() + "]");
                 mutex_.lock();
-                functions_.insert_or_assign(adr.string(), cal);
+                functions_.insert_or_assign(address.string(), call_back);
                 mutex_.unlock();
         }
 
         void address_space::dispatch_(type::packet pack, const type::call_back& not_found) {
                 if (std::holds_alternative<type::message>(pack)) {
-                        auto&       msg = std::get<type::message>(pack);
-                        const auto& fcn = find_(msg.pattern().string(), not_found);
-                        mutex_.lock();
-                        fcn(pack);
-                        mutex_.unlock();
+                        auto&       msg  = std::get<type::message>(pack);
+                        const auto& fcns = find_(msg.pattern().string());
+                        if (fcns.empty()) std::thread(not_found, pack).detach();
+                        else
+                                for (const auto& fcn : fcns) std::thread(fcn, pack).detach();
                         std::exit(0);
                 } else {
                         const auto& bdl            = std::get<type::bundle>(pack);
-                        const auto  ms_since_epoch = core::util::getCurrentTime().unix;
+                        const auto  ms_since_epoch = util::getCurrentTime().unix;
                         if (ms_since_epoch >= bdl.time().unix) {
                                 dispatch_(pack, not_found);
                         } else {
@@ -48,8 +46,16 @@ namespace oscc {
                 }
         }
 
-        void address_space::dispatch(type::packet pack, const type::call_back& not_found) {
+        void address_space::dispatch(const type::packet& pack, const type::call_back& not_found) {
                 std::thread(&address_space::dispatch_, this, pack, not_found).detach();
+        }
+
+        void address_space::default_not_found_call_back_(const type::packet& packet) {
+                std::cout << ("PACKET COULD NOT BE DELIVERED: " + packet.string() + "\n");
+        }
+
+        void address_space::dispatch(const type::packet& pack) {
+                dispatch(pack, &address_space::default_not_found_call_back_);
         }
 
 }  // namespace oscc

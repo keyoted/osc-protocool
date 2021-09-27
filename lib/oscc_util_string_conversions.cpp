@@ -1,7 +1,8 @@
 #include "oscc_util.hpp"
 
-namespace oscc::core::util {
+namespace oscc::util {
         // TODO: clean-up
+        // NOTE: maybe start thinking about something like bison
         /* format:
                bundle: #:123[...;...;...]
                        123 -- is milliseconds offset from now
@@ -194,6 +195,8 @@ namespace oscc::core::util {
                                         return (negative) ? -v : v;
                                 }
 #endif
+                                // NOTE: Not used but VSC complains about it...
+                                default: return 0;
                         }
                 };
 
@@ -438,7 +441,7 @@ namespace oscc::core::util {
         std::string string(const type::bundle& bdl) {
                 std::string str{"#"};
 
-                const auto  cur_time = core::util::getCurrentTime();
+                const auto  cur_time = util::getCurrentTime();
                 if (bdl.time().unix <= cur_time.unix) str += '0';
                 else
                         str += std::to_string(bdl.time().unix - cur_time.unix);
@@ -453,6 +456,13 @@ namespace oscc::core::util {
                 return str;
         }
 
+        /**
+         * Fill the first two character of an array with the hexadecimal
+         * representation of a byte.
+         * @param c The byte to convert to hexadecimal.
+         * @param arr The array where to write the conversion to.
+         * @return The array passed as an imput.
+         */
         char* to_hex(const char c, char* arr) {
                 constexpr char hex[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
                 arr[0]               = hex[(c & 0xF0) >> 4];
@@ -500,7 +510,7 @@ namespace oscc::core::util {
 #endif
 #ifdef OSCC_TYPE_t
                                         } else if constexpr (std::is_same_v<T, type::time>) {
-                                                const auto cur_time = core::util::getCurrentTime().unix;
+                                                const auto cur_time = util::getCurrentTime().unix;
                                                 str += ':';
                                                 if (arg.unix <= cur_time) str += "0 ";
                                                 else
@@ -571,4 +581,4 @@ namespace oscc::core::util {
                         return "";
         }
 
-}  // namespace oscc::core::util
+}  // namespace oscc::util

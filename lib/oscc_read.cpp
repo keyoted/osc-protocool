@@ -1,26 +1,28 @@
 #include "oscc_read.hpp"
+// TODO: Handle systems with different endianness
 
-namespace oscc::core::read {
-        // TODO: Handle systems with different endianness
-        type::int32 int32(util::arrayConsumer<char>& data) {
-                type::int32 ret;
-                std::memcpy(&ret, data.consume(sizeof(type::int32)), sizeof(type::int32));
+namespace oscc::util::read {
+
+        /**
+         * A helper templated function to read most types.
+         * @tparam T The type of data to read.
+         * @param data The byte array where to read the data from.
+         * @return The data read from the byte array as a type T.
+         */
+        template <typename T>
+        T trivial_read(util::arrayConsumer<char>& data) {
+                T ret{};
+                std::memcpy(&ret, data.consume(sizeof(T)), sizeof(T));
                 return ret;
         }
 
-        type::float32 float32(util::arrayConsumer<char>& data) {
-                type::float32 ret;
-                std::memcpy(&ret, data.consume(sizeof(type::float32)), sizeof(type::float32));
-                return ret;
-        }
+        type::int32   int32(util::arrayConsumer<char>& data) { return trivial_read<type::int32>(data); }
 
-        type::time time(util::arrayConsumer<char>& data) {
-                type::time NTP;
-                std::memcpy(&NTP, data.consume(sizeof(type::time)), sizeof(type::time));
-                return util::NTPtoUNIX(NTP);
-        }
+        type::float32 float32(util::arrayConsumer<char>& data) { return trivial_read<type::float32>(data); }
 
-        type::string string(util::arrayConsumer<char>& data) {
+        type::time    time(util::arrayConsumer<char>& data) { return trivial_read<type::time>(data); }
+
+        type::string  string(util::arrayConsumer<char>& data) {
                 type::string ret{data.consumeUntilOrThrow('\0')};
                 data.consume(3 - ((ret.length() + (1 + 3)) % 4));
                 return ret;
@@ -33,33 +35,17 @@ namespace oscc::core::read {
                 return ret;
         }
 
-        type::int64 int64(util::arrayConsumer<char>& data) {
-                type::int64 ret;
-                std::memcpy(&ret, data.consume(sizeof(type::int64)), sizeof(type::int64));
-                return ret;
-        }
+        type::int64 int64(util::arrayConsumer<char>& data) { return trivial_read<type::int64>(data); }
 
 #ifdef OSCC_TYPE_d
-        type::float64 float64(util::arrayConsumer<char>& data) {
-                type::float64 ret;
-                std::memcpy(&ret, data.consume(sizeof(type::float64)), sizeof(type::float64));
-                return ret;
-        }
+        type::float64 float64(util::arrayConsumer<char>& data) { return trivial_read<type::float64>(data); }
 #endif
 
 #ifdef OSCC_TYPE_m
-        type::midi midi(util::arrayConsumer<char>& data) {
-                type::midi ret;
-                std::memcpy(&ret, data.consume(sizeof(type::midi)), sizeof(type::midi));
-                return ret;
-        }
+        type::midi midi(util::arrayConsumer<char>& data) { return trivial_read<type::midi>(data); }
 #endif
 
 #ifdef OSCC_TYPE_r
-        type::rgba rgba(util::arrayConsumer<char>& data) {
-                type::rgba ret;
-                std::memcpy(&ret, data.consume(sizeof(type::rgba)), sizeof(type::rgba));
-                return ret;
-        }
+        type::rgba rgba(util::arrayConsumer<char>& data) { return trivial_read<type::rgba>(data); }
 #endif
-}  // namespace oscc::core::read
+}  // namespace oscc::util::read

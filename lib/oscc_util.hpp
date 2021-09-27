@@ -4,33 +4,175 @@
 #include <stdexcept>
 #include "oscc_types.hpp"
 
-namespace oscc::core::util {
+namespace oscc::util {
+
+        // TODO: look into actual streams
+        //! A helper class to stream data from an array.
+        /**
+         * This class allows for reading data from an array without causing
+         * illegal access errors.
+         * @tparam T The type of data in the array.
+         */
         template <typename T>
         class arrayConsumer {
                 private:
-                        T*          data;
+                        /** The data array. */
+                        T* data;
+                        /** The number of elements in the array. */
                         std::size_t size;
 
                 public:
+                        /**
+                         * Constructor.
+                         * @param data The data array.
+                         * @param size The number of elements in the array.
+                         */
                         arrayConsumer(T* data, std::size_t size);
-                        T*               consume(std::size_t elements);
-                        arrayConsumer<T> reserve(std::size_t limit);
-                        T                peek() const;
-                        bool             isEmpty();
-                        T*               consumeUntilOrThrow(const T& element);
+
+                        /**
+                         * Consume "count" elements from the data array.
+                         * @param count The number of elements to consume.
+                         * @return A pointer to an array containing the "count"
+                         * elements consumed from the data array.
+                         */
+                        T* consume(std::size_t count);
+
+                        /**
+                         * Consume "count" elements from the data array.
+                         * @param count The number of elements to consume.
+                         * @return An array consumer containing the "count"
+                         * elements consumed from the data array.
+                         */
+                        arrayConsumer<T> reserve(std::size_t count);
+
+                        /**
+                         * Peek next element without consuming it.
+                         * @return The element that was peeked.
+                         */
+                        T peek() const;
+
+                        /**
+                         * Check if the array is empty.
+                         * @return True iff the array does not contain any more
+                         * elements.
+                         */
+                        bool isEmpty();
+
+                        /**
+                         * Consume elements until the las element that was
+                         * consumed is equal to the element specified.
+                         * @param element The element to compare.
+                         * @return An array consumer containing the elements
+                         * consumed from the data array.
+                         */
+                        T* consumeUntilOrThrow(const T& element);
         };
 
-        type::time   NTPtoUNIX(const oscc::type::time& NTP);
-        type::time   UNIXtoNTP(const oscc::type::time& UNIX);
-        bool         isMatch(type::string address, type::string pattern);
-        bool         isValidAddress(std::string address);
-        bool         isValidPattern(std::string pattern);
+        /**
+         * Converts NTP time to UNIX time.
+         * @param NTP The absolute time in NTP format.
+         * @return The time in UNIX format (milliseconds since 1970/1/1 00:00 +0).
+         */
+        type::time NTPtoUNIX(const oscc::type::time& NTP);
+
+        /**
+         * Converts UNIX time to NTP time.
+         * @param UNIX The time in UNIX format (milliseconds since 1970/1/1 00:00 +0).
+         * @return The time in NTP format.
+         */
+        type::time UNIXtoNTP(const oscc::type::time& UNIX);
+
+        /**
+         * Determines if an address matches a certain pattern.
+         * @param address The address to match.
+         * @param pattern The pattern to use for the matching.
+         * @return True iff the address matches the pattern.
+         */
+        bool isMatch(type::string address, type::string pattern);
+
+        /**
+         * Check if an address is a valid OSC address.
+         * @param address The address to check.
+         * @return True iff the address is a valid OSC address.
+         */
+        bool isValidAddress(std::string address);
+
+        /**
+         * Check if a pattern is a valid OSC pattern.
+         * @param pattern The pattern to check.
+         * @return True iff the pattern is a valid OSC pattern.
+         */
+        bool isValidPattern(std::string pattern);
+
+        /**
+         * Turn a string into an OSC packet.
+         * @param OSC_str The string to convert.
+         * @return The OSC packet generated by the input string.
+         */
         type::packet strToOSC(const std::string& OSC_str);
-        std::string  string(const type::arguments& args);
-        std::string  string(const type::bundle& bdl);
-        std::string  string(const type::message& msg);
-        std::string  string(const type::packet& pkt);
-        type::time   getCurrentTime();
-}  // namespace oscc::core::util
+
+        /**
+         * Stringify list of arguments.
+         * @param args The list of arguments.
+         * @return A string representation of the list of arguments.
+         */
+        std::string string(const type::arguments& args);
+
+        /**
+         * Stringify bundle.
+         * @param args The bundle.
+         * @return A string representation of the bundle.
+         */
+        std::string string(const type::bundle& bdl);
+
+        /**
+         * Stringify message.
+         * @param args The message.
+         * @return A string representation of the message.
+         */
+        std::string string(const type::message& msg);
+
+        /**
+         * Stringify packet.
+         * @param args The packet.
+         * @return A string representation of the packet.
+         */
+        std::string string(const type::packet& pkt);
+
+        /**
+         * Get current unix time.
+         * @return The number of milliseconds since the unix epoch.
+         */
+        type::time getCurrentTime();
+
+        /**
+         * Convert binary data into an OSC packet.
+         * @param bytes The binary data.
+         * @param size Number of bytes in the binary data.
+         * @return The OSC packet.
+         */
+        type::packet bytesToOSC(char* bytes, size_t size);
+
+        /**
+         * Convert binary data into an OSC packet.
+         * @param bytes The binary data.
+         * @return The OSC packet.
+         */
+        type::packet bytesToOSC(type::blob bytes);
+
+        /**
+         * Convert binary data into an OSC packet.
+         * @param bytes The binary data.
+         * @return The OSC packet.
+         */
+        type::packet bytesToOSC(util::arrayConsumer<char>& bytes);
+
+        /**
+         * Convert an OSC packet into binary data.
+         * @param data The OSC packet.
+         * @return The binary data.
+         */
+        std::vector<char> OSCToBytes(const type::packet& data);
+}  // namespace oscc::util
 
 #include "oscc_util_arrayConsumer.hpp"

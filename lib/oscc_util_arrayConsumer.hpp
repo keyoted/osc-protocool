@@ -2,26 +2,26 @@
 
 #include "oscc_util.hpp"
 
-namespace oscc::core::util {
+namespace oscc::util {
         template <typename T>
         arrayConsumer<T>::arrayConsumer(T* data, std::size_t size) : data(data), size(size) {}
 
         template <typename T>
-        T* arrayConsumer<T>::consume(std::size_t elements) {
-                if (elements > size) throw std::out_of_range("Invalid access");
+        T* arrayConsumer<T>::consume(std::size_t count) {
+                if (count > size) throw std::out_of_range("Invalid access");
                 T* n = data;
-                data += elements;
-                size -= elements;
+                data += count;
+                size -= count;
                 return n;
         }
 
         template <typename T>
-        arrayConsumer<T> arrayConsumer<T>::reserve(std::size_t limit) {
-                if (limit > size) throw std::out_of_range("Cannot extend range");
+        arrayConsumer<T> arrayConsumer<T>::reserve(std::size_t count) {
+                if (count > size) throw std::out_of_range("Cannot extend range");
                 T* n = data;
-                data += limit;
-                size -= limit;
-                return arrayConsumer(n, limit);
+                data += count;
+                size -= count;
+                return arrayConsumer(n, count);
         }
 
         template <typename T>
@@ -42,4 +42,4 @@ namespace oscc::core::util {
                 }
                 throw std::out_of_range("Element not found in range");
         }
-}  // namespace oscc::core::util
+}  // namespace oscc::util

@@ -1,15 +1,10 @@
 #include "oscc_util.hpp"
 
-namespace oscc::core::util {
+namespace oscc::util {
 
 #define EPOCH_TIME_DIFFERENCE_S  (2208988800LL)
 #define EPOCH_TIME_DIFFERENCE_MS (EPOCH_TIME_DIFFERENCE_S * 1000LL)
 
-        /**
-         * Converts NTP time to UNIX time.
-         * @param NTP The absolute time in NTP format.
-         * @return The time in UNIX format (milliseconds since 1970/1/1 00:00 +0).
-         */
         oscc::type::time NTPtoUNIX(const oscc::type::time& NTP) {
                 if ((NTP.ntp & 1U) == 1) return type::time{0};  // Least significant bit means now
                 else {
@@ -21,11 +16,6 @@ namespace oscc::core::util {
                 }
         }
 
-        /**
-         * Converts UNIX time to NTP time.
-         * @param UNIX The time in UNIX format (milliseconds since 1970/1/1 00:00 +0).
-         * @return The time in NTP format.
-         */
         oscc::type::time UNIXtoNTP(const oscc::type::time& UNIX) {
                 // There is a constant offset of seconds between 1900/1/1 UTC and 1970/1/1 UTC
                 const auto               millis   = UNIX.unix - EPOCH_TIME_DIFFERENCE_MS;
@@ -34,7 +24,6 @@ namespace oscc::core::util {
                 const oscc::type::uint32 ret[2]{secconds, fraction};
                 return *((oscc::type::time*)ret);
         }
-
 
         /**
          * Tries to match at least one character from addr to the pattern (patrn).
@@ -185,12 +174,6 @@ namespace oscc::core::util {
                 }
         }
 
-        /**
-         * Determines if an address matches a certain pattern.
-         * @param address The address to match.
-         * @param pattern The pattern to use for the matching.
-         * @return True iff the address matches the pattern.
-         */
         bool isMatch(const type::string address, const type::string pattern) {
                 // TODO: find_ a way to do this without recursion.
                 std::function<bool(const char*, const char*)> handle_wildcard;
@@ -258,6 +241,7 @@ namespace oscc::core::util {
                                 } break;
 
                                 case in_brackets: {
+                                        // These cannot be matched against because they are invalid in address names
                                         if (!std::isprint(c) || c == ' ' || c == '#' || c == '*' || c == ',' ||
                                             c == '/' || c == '?' || c == '[' || c == '{' || c == '}')
                                                 return false;
@@ -266,6 +250,7 @@ namespace oscc::core::util {
                                 } break;
 
                                 case in_list: {
+                                        // These cannot be matched against because they are invalid in address names
                                         if (!std::isprint(c) || c == ' ' || c == '#' || c == '*' || c == '/' ||
                                             c == '?' || c == '{' || c == '[' || c == ']')
                                                 return false;
@@ -282,4 +267,4 @@ namespace oscc::core::util {
                                           std::chrono::system_clock::now().time_since_epoch())
                                           .count()};
         }
-}  // namespace oscc::core::util
+}  // namespace oscc::util

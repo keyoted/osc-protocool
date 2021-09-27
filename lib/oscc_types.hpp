@@ -1,6 +1,5 @@
 #pragma once
 
-#include <cmath>
 #include <cstdint>
 #include <filesystem>
 #include <functional>
@@ -9,14 +8,78 @@
 #include <variant>
 #include <vector>
 
+/**
+ * \def OSCC_TYPE1_1
+ * If defined, this macro enables the types defined in the 1.1 specification
+ * including: true/false, null, impulse and time.
+ */
+
+/**
+ * \def OSCC_TYPE_NON_STD
+ * If defined, this macro enables the types mentioned in the specifications as
+ * being non-standard including: all the types in the 1.1 specification,
+ * 64-bit integers, 64-bit double/float, symbols, ascii characters, rgba colors,
+ * midi messages, and arrays.
+ */
+
+/** OSCC_TYPE_TF
+ * If defined the true/false type is available.
+ */
+
+/** OSCC_TYPE_N
+ * If defined the null type is available.
+ */
+
+/** OSCC_TYPE_I
+ * If defined the impulse type is available.
+ */
+
+/** OSCC_TYPE_t
+ * If defined the time type is available.
+ */
+
+/** OSCC_TYPE_h
+ * If defined the 64-bit integer type is available.
+ */
+
+/** OSCC_TYPE_d
+ * If defined the 64-bit float/double type is available.
+ */
+
+/** OSCC_TYPE_S
+ * If defined the symbol type is available.
+ */
+
+/** OSCC_TYPE_c
+ * If defined the character type is available.
+ */
+
+/** OSCC_TYPE_m
+ * If defined the midi type is available.
+ */
+
+/** OSCC_TYPE_r
+ * If defined the rgba type is available.
+ */
+
+/** OSCC_TYPE_ARR_
+ * If defined the array type is available.
+ */
+
+/** OSCC_TYPES_VAL
+ * If defined the types true/false and/or null and/or and/or impulse are
+ * available, this types do not take any data and are defined on their own
+ * structure.
+ */
+
 #ifdef OSCC_TYPE_NON_STD
         #define OSCC_TYPE1_1
         #define OSCC_TYPE_h
         #define OSCC_TYPE_d
+        #define OSCC_TYPE_S
         #define OSCC_TYPE_c
         #define OSCC_TYPE_m
         #define OSCC_TYPE_r
-        #define OSCC_TYPE_S
         #define OSCC_TYPE_ARR_
 #endif
 
@@ -33,23 +96,25 @@
 
 namespace oscc::type {
 
-        class message;
+        /** Represents a 32-bit integer. */
+        typedef std::int32_t int32;
 
-        class bundle;
-
-        typedef std::int32_t  int32;
-
+        /** Represents a 32-bit unsigned integer. */
         typedef std::uint32_t uint32;
 
-        typedef std::int64_t  int64;
+        /** Represents a 64-bit integer. */
+        typedef std::int64_t int64;
 
-        typedef std::float_t  float32;
+        /** Represents a 32-bit float. */
+        typedef std::float_t float32;
 
 #ifdef OSCC_TYPE_d
+        /** Represents a 64-bit float. */
         typedef long double float64;
 #endif
 
 #ifdef OSCC_TYPE_m
+        /** Represents midi data. */
         typedef struct {
                         unsigned char port_ID;
                         unsigned char status;
@@ -59,6 +124,7 @@ namespace oscc::type {
 #endif
 
 #ifdef OSCC_TYPE_r
+        /** Represents rgba data. */
         typedef struct {
                         unsigned char red;
                         unsigned char green;
@@ -68,6 +134,7 @@ namespace oscc::type {
 #endif
 
 #ifdef OSCC_TYPE_S
+        /** Represents symbol data. */
         class symbol {
                 public:
                         std::string identifier;
@@ -75,18 +142,26 @@ namespace oscc::type {
         };
 #endif
 
-        typedef std::string           string;
+        /** Represents a string. */
+        typedef std::string string;
 
-        typedef std::vector<char>     blob;
+        /** Represents a blob. */
+        typedef std::vector<char> blob;
 
+        /** Represents an OSC address or pattern. */
         typedef std::filesystem::path address;
 
+        /** Represents time data. */
         typedef union {
                         int64 unix;
                         int64 ntp;
         } time;
 
 #ifdef OSCC_TYPES_VAL
+        /**
+         * Represents an argume without a value, its value is the argument
+         * itself.
+         * */
         enum value_argument {
         #ifdef OSCC_TYPE_TF
                 T,
@@ -101,11 +176,11 @@ namespace oscc::type {
         };
 #endif
 
-
 #ifdef OSCC_TYPE_ARR_
         class arguments;
 #endif
 
+        /** Represents an argument that chan be passed to a OSC method. */
         typedef std::variant<int32,
                              float32,
                              string,
@@ -149,55 +224,19 @@ namespace oscc::type {
                              >
                 argument;
 
-
+        /** Represents a group of arguments. */
         class arguments : public std::vector<argument> {};
 
+        /** Represents a packet that is either a message or a bundle. */
         class packet;
 
-        typedef std::vector<packet>         packets;
+        /** Represents a group of packets */
+        typedef std::vector<packet> packets;
 
-        typedef std::function<void(packet)> call_back;
-
-        class message {
-                private:
-                        type::address   address_pattern_;
-                        type::arguments arguments_;
-
-                public:
-                        explicit message(type::address path);
-                        template <typename T>
-                        void push(T&& val) {
-                                arguments_.push_back(std::forward<T>(val));
-                        }
-                        void                                 push(type::argument& arg);
-                        [[nodiscard]] std::string            string() const;
-                        [[nodiscard]] type::address&         pattern();
-                        [[nodiscard]] type::arguments&       arguments();
-                        [[nodiscard]] const type::address&   pattern() const;
-                        [[nodiscard]] const type::arguments& arguments() const;
-        };
-
-        class bundle {
-                private:
-                        type::time    time_;
-                        type::packets contents_;
-
-                public:
-                        explicit bundle(type::time time);
-                        template <typename T>
-                        void push(T&& val) {
-                                contents_.push_back(std::forward<T>(val));
-                        }
-                        [[nodiscard]] std::string   string() const;
-                        [[nodiscard]] type::time    time() const;
-                        [[nodiscard]] type::packets contents() const;
-        };
-
-        class packet : public std::variant<bundle, message> {
-                public:
-                        packet(std::string OSCstring);
-                        template <typename T>
-                        packet(T t) : variant(t){};
-                        [[nodiscard]] std::string string() const;
-        };
+        /** Represents a system method that can be called via OSC */
+        typedef std::function<void(const packet&)> call_back;
 }  // namespace oscc::type
+
+#include "oscc_types_bundle.hpp"
+#include "oscc_types_message.hpp"
+#include "oscc_types_packet.hpp"

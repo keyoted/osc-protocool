@@ -1,9 +1,9 @@
 #include <functional>
 #include <iostream>
 #include <type_traits>
-#include "lib/oscc_core.hpp"
+#include "lib/oscc_util.hpp"
 
-int    main() {
+int main() {
         using namespace std;
         ios init(nullptr);
         init.copyfmt(cout);
@@ -130,14 +130,14 @@ int    main() {
         cout.copyfmt(init);
         cout << "+++ MATCH +++" << endl;
         for (size_t i = 0; i < sizeof(pats) / sizeof(pats[0]); i += 3) {
-                bool res      = oscc::core::util::isMatch(pats[i + 1], pats[i]);
+                bool res      = oscc::util::isMatch(pats[i + 1], pats[i]);
                 bool expected = (pats[i + 2] == "t");
                 cout << ((res == expected) ? "OK     " : "ERROR  ") << pats[i + 1] << " == " << pats[i] << "   -> "
                      << res << "\t\t[" << i << "]" << endl;
         }
 
-        auto t = oscc::core::util::strToOSC(
-                   R"(#1230[/path 1 2.0 1i 2f 3l 4d "5" '6' {7} x0194 :123 #01020304 .01030507 [1[2]3];/path2;#;#0;#10000[/path3; /path4 [3 4 5]]; /*/hello 5 4 "bye"])");
+        auto t = oscc::util::strToOSC(
+                R"(#1230[/path 1 2.0 1i 2f 3l 4d "5" '6' {7} x0194 :123 #01020304 .01030507 [1[2]3];/path2;#;#0;#10000[/path3; /path4 [3 4 5]]; /*/hello 5 4 "bye"])");
         cout.copyfmt(init);
         cout << t.string() << endl;
         return 0;

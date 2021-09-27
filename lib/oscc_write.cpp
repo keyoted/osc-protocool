@@ -4,7 +4,7 @@
 #include "oscc_types.hpp"
 #include "oscc_util.hpp"
 
-namespace oscc::core::write {
+namespace oscc::util::write {
         void int32(const type::int32& data, std::vector<char>& bytes) {
                 bytes.insert(bytes.end(), sizeof(type::int32), '\0');
                 memcpy(&*(bytes.end() - sizeof(type::int32)), &data, sizeof(type::int32));
@@ -17,7 +17,7 @@ namespace oscc::core::write {
 
         void time(const type::time& UNIX, std::vector<char>& bytes) {
                 bytes.insert(bytes.end(), sizeof(type::time), '\0');
-                const auto NTP = oscc::core::util::UNIXtoNTP(UNIX);
+                const auto NTP = oscc::util::UNIXtoNTP(UNIX);
                 memcpy(&*(bytes.end() - sizeof(type::time)), &NTP, sizeof(type::time));
         }
 
@@ -57,4 +57,4 @@ namespace oscc::core::write {
                 memcpy(&*(bytes.end() - sizeof(type::rgba)), &data, sizeof(type::rgba));
         }
 #endif
-}  // namespace oscc::core::write
+}  // namespace oscc::util::write

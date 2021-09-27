@@ -1,11 +1,12 @@
-#include "oscc_core.hpp"
+#include "oscc_read.hpp"
+#include "oscc_util.hpp"
+#include "oscc_write.hpp"
 
+namespace oscc::util {
 
-namespace oscc::core {
+#define BUNDLE_IDENTIFIER ("#bundle")
 
-        constexpr char BUNDLE_IDENTIFIER[] = "#bundle";
-
-        type::packet   bytesToOSC(char* bytes, size_t size) {
+        type::packet bytesToOSC(char* bytes, size_t size) {
                 util::arrayConsumer<char> ac{bytes, size};
                 return bytesToOSC(ac);
         }
@@ -67,6 +68,7 @@ namespace oscc::core {
                                                 case 'd': push(read::float64(data)); break;
 #endif
 #ifdef OSCC_TYPE_c
+                                                // TODO: read::character
                                                 case 'c': push((char)read::int32(data)); break;
 #endif
 #ifdef OSCC_TYPE_m
@@ -146,7 +148,7 @@ namespace oscc::core {
                                 }
                         }
 #endif
-                        write::string(string(count, ','), bytes);
+                        write::string(type::string(count, ','), bytes);
 #ifndef OSCC_TYPE_ARR_
                         for (const auto& argument : message.arguments()) {
 #else
@@ -209,6 +211,7 @@ namespace oscc::core {
                                                         write::float64(arg, bytes);
 #endif
 #ifdef OSCC_TYPE_c
+                                                        // TODO: write::character
                                                 } else if constexpr (is_same_v<T, char>) {
                                                         bytes[location++] = 'c';
                                                         write::int32((type::int32)arg, bytes);
@@ -247,4 +250,4 @@ namespace oscc::core {
                 const type::int32 size = bytes.size() - initialSize - 4;
                 memcpy(&*(bytes.begin() + initialSize), &size, sizeof(type::int32));
         }
-}  // namespace oscc::core
+}  // namespace oscc::util

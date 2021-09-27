@@ -8,7 +8,6 @@ add_compile_definitions(OSCC_TYPE_NON_STD)
 add_library(
         OSCC STATIC
         lib/oscc_read.cpp
-        lib/oscc_core.cpp
         lib/oscc_write.cpp
         lib/oscc_types_bundle.cpp
         lib/oscc_types_message.cpp
@@ -16,7 +15,7 @@ add_library(
         lib/oscc_address_space.cpp
         lib/oscc_util.cpp
         lib/oscc_util_string_conversions.cpp
-)
+        lib/oscc_util_byte_conversions.cpp)
 
 add_executable(
         executable

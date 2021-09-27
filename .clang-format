@@ -2,7 +2,7 @@
 BasedOnStyle: Chromium
 AlignConsecutiveMacros: AcrossEmptyLinesAndComments
 AlignConsecutiveAssignments: AcrossEmptyLinesAndComments
-AlignConsecutiveDeclarations: AcrossEmptyLinesAndComments
+AlignConsecutiveDeclarations: AcrossEmptyLines
 AlignEscapedNewlines: Right
 AlignOperands: 'true'
 AllowShortBlocksOnASingleLine: Always
@@ -15,7 +15,7 @@ ColumnLimit: 120
 ContinuationIndentWidth: 8
 IndentWidth: 8
 IndentWrappedFunctionNames: true
-MaxEmptyLinesToKeep: 2
+MaxEmptyLinesToKeep: 1
 SortIncludes: CaseSensitive
 TabWidth: 8
 UseTab: Never

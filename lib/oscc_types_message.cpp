@@ -2,7 +2,7 @@
 #include "oscc_util.hpp"
 
 namespace oscc::type {
-        message::message(oscc::type::address path) : address_pattern_(std::move(path)) {}
+        message::message(oscc::type::address pattern) : address_pattern_(std::move(pattern)) {}
 
         type::address&         message::pattern() { return address_pattern_; }
 
@@ -14,5 +14,5 @@ namespace oscc::type {
 
         void                   message::push(type::argument& arg) { arguments_.insert(arguments_.end(), arg); }
 
-        std::string            message::string() const { return core::util::string(*this); }
+        std::string            message::string() const { return util::string(*this); }
 }  // namespace oscc::type
